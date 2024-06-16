@@ -10,3 +10,14 @@
     background: var(--white);
     overflow: hidden;
 }
+
+.oplayout {
+    width: 23.4375rem;
+    height: 41.6875rem;
+    flex-shrink: 0;
+
+    
+    background-color: rgba(0, 0, 0, 0.5);
+    background: #000;
+    overflow: hidden;
+}
