@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import styles from './subMenu.module.css'
-import layout from './Layout.module.css'
-import img from '../images/submenu/bookicon.svg'
-import img2 from '../images/submenu/compareicon.svg'
-import logoutimg from '../images/submenu/logout.svg'
+import layout from '../CommonStyles/Layout.module.css'
+import img from '../../images/submenu/bookicon.svg'
+import img2 from '../../images/submenu/compareicon.svg'
+import logoutimg from '../../images/submenu/logout.svg'
 
 export default function SubMenu() {
     const [email, setEmail] = useState("로그인이 필요합니다");

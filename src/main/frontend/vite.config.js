@@ -10,11 +10,19 @@ export default defineConfig({
         target: 'http://localhost:8080',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
-      },
-      // '/auth/kakao' : {
-      //   target: 'http://localhost:3001',
+      // },
+      // '/oauth2' : {
+      //   target: 'http://localhost:8080',
       //   changeOrigin: true,
-      // }
+      // },
+      // '/login' : {
+      //   target: 'http://localhost:8080',
+      //   changeOrigin: true,
+      // },
+      // '/logout' : {
+      //   target: 'http://localhost:8080',
+      //   changeOrigin: true,
+      }
     },
   }
 })

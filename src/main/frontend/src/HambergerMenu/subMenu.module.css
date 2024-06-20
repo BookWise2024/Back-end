@@ -1,10 +1,10 @@
 @font-face {
     font-family : "Jalnan 2";
-    src: url(../font/Jalnan2TTF.ttf);
+    src: url(../../font/Jalnan2TTF.ttf);
 }
 @font-face {
     font-family : 'Pretendard';
-    src: url(../font/PretendardVariable.ttf);
+    src: url(../../font/PretendardVariable.ttf);
 }
 
 :root{

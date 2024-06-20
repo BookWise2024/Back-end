@@ -1,5 +1,8 @@
 package com.temp.booksearch.member.service;
 
+import com.temp.booksearch.member.VO.MemberVO;
+import com.temp.booksearch.member.repository.MemberRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -25,6 +28,9 @@ public class KakaoService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
+    @Autowired
+    private MemberRepository userRepository;
+
     public Map<String, Object> getToken(String code) {
         // token 요청하는 엔드 포인트 url
         String tokenUrl = "https://kauth.kakao.com/oauth/token";
@@ -42,8 +48,10 @@ public class KakaoService {
         params.add("code", code);
         params.add("client_secret", clientSecret);
 
+        // HTTP 요청 엔티티 생성
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 
+        // POST 요청을 보내고 응답을 받아옴
         ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, request, Map.class);
 
         return response.getBody();
@@ -61,5 +69,20 @@ public class KakaoService {
         ResponseEntity<Map> response = restTemplate.exchange(userInfoUrl, HttpMethod.GET, request, Map.class);
 
         return response.getBody();
+    }
+
+    public MemberVO saveUser(Map<String, Object> userInfo) {
+        String username = userInfo.get("id").toString();
+        Map<String, String> kakaoAccount = (Map<String, String>) userInfo.get("kakao_account");
+        String email = kakaoAccount.get("email");
+
+        MemberVO user = userRepository.findByUserName(username);
+        if (user == null) {
+            user = new MemberVO();
+            user.setUserName(username);
+            user.setEmail(email);
+            userRepository.save(user);
+        }
+        return user;
     }
 }

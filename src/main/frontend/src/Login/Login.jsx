@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import kakao from './kakao.module.css'
-import layout from './Layout.module.css'
+import layout from '../CommonStyles/Layout.module.css'
 
 export default function Login() {
 

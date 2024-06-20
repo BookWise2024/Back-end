@@ -4,9 +4,10 @@ import axios from 'axios';
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import Login from './Login.jsx';
-import SubMenu from './SubMenu.jsx';
-import Callback from './Callback.jsx';
+import Login from './Login/Login.jsx';
+import MainPage from './MainPage/MainPage.jsx';
+import Callback from './Login/Callback.jsx';
+import SubMenu from './HambergerMenu/SubMenu.jsx';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -22,13 +23,14 @@ function App() {
   return (
     <>
       <ul>
-        <li><Link to = "/kakao">Kakao Login</Link></li>
+        <li><Link to = "/login">Kakao Login</Link></li>
         <li><Link to = "/sub">Hamberger Menu</Link></li>
       </ul>
       <Routes>
-        <Route path = "/kakao" element={<Login />}/>
-        <Route path = "/sub" element={<SubMenu />}/>
+        <Route path = "/login" element={<Login />}/>
+        <Route path = "/home" element={<MainPage />}/>
         <Route path = "/auth/kakao/callback" element={<Callback />}/>
+        <Route path = "/sub" element={<SubMenu />}/>
       </Routes>
 
       {/* spring boot 연결 테스트 코드 */}
