@@ -28,7 +28,7 @@ function App() {
       </ul>
       <Routes>
         <Route path = "/login" element={<Login />}/>
-        <Route path = "/home" element={<MainPage />}/>
+        <Route path = "/" element={<MainPage />}/>
         <Route path = "/auth/kakao/callback" element={<Callback />}/>
         <Route path = "/sub" element={<SubMenu />}/>
       </Routes>

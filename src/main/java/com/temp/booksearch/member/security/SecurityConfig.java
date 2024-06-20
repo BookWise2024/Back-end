@@ -15,7 +15,7 @@ public class SecurityConfig{
         http
                 .cors().configurationSource(corsConfigurationSource()).and() // CORS 설정 추가
                 .authorizeHttpRequests(authorize -> authorize
-                        // root경로, login경로, 콜백 경로
+                        // root경로, login경로
                         .requestMatchers("/", "/login", "/api/auth/kakao/callback", "/api/auth/kakao/token").permitAll()
                         // 위 경로를 제외한 나머지 요청은 인증 요구
                         .anyRequest().authenticated()

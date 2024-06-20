@@ -16,7 +16,7 @@ const Callback = () => {
                 try {
                     const response = await axios.post('http://localhost:8080/api/auth/kakao/callback', { code }, { withCredentials: true });
                     console.log(response.data); // 성공적으로 받은 사용자 데이터
-                    navigate('/home'); // 처리 후 원하는 경로로 이동
+                    navigate('/'); // 처리 후 원하는 경로로 이동
                 } catch (error) {
                     console.error('Error during the callback processing', error);
                 }
