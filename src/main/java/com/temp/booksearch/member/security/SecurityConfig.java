@@ -37,6 +37,7 @@ public class SecurityConfig{
         return http.build();
     }
 
+    // CORS 설정
     private UrlBasedCorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();

@@ -57,11 +57,11 @@ public class KakaoController {
         String accessToken = (String) token.get("access_token");
         Map<String, Object> userInfo = kakaoService.getUserInfo(accessToken);
 
-        // Save user info in session
+        // 사용자 정보를 세션에 저장
         MemberVO user = kakaoService.saveUser(userInfo);
         session.setAttribute("user", user);
 
-        // Authenticate the user
+        // 사용자 인증
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(user.getUserName(), null, new ArrayList<>());
 
