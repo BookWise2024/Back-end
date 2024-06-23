@@ -1,7 +1,8 @@
 package com.temp.booksearch.member.service;
 
 import com.temp.booksearch.member.VO.MemberVO;
-import com.temp.booksearch.member.repository.MemberRepository;
+import com.temp.booksearch.member.DAO.MemberRepository;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -9,7 +10,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,18 +18,20 @@ import java.util.Map;
 public class KakaoService {
 
     @Value("${kakao.client-id}")
+    @Getter
     private String clientId;
 
     @Value("${kakao.client-secret}")
+    @Getter
     private String clientSecret;
 
     @Value("${kakao.redirect-uri}")
+    @Getter
     private String redirectUri;
-
-    private final RestTemplate restTemplate = new RestTemplate();
 
     @Autowired
     private MemberRepository userRepository;
+    private final RestTemplate restTemplate = new RestTemplate();
 
     public Map<String, Object> getToken(String code) {
         // token 요청하는 엔드 포인트 url
@@ -66,7 +68,8 @@ public class KakaoService {
 
         HttpEntity<Void> request = new HttpEntity<>(headers);
 
-        ResponseEntity<Map> response = restTemplate.exchange(userInfoUrl, HttpMethod.GET, request, Map.class);
+        ResponseEntity<Map> response =
+        restTemplate.exchange(userInfoUrl, HttpMethod.GET, request, Map.class);
 
         return response.getBody();
     }
@@ -74,13 +77,14 @@ public class KakaoService {
     public MemberVO saveUser(Map<String, Object> userInfo) {
         String username = userInfo.get("id").toString();
         Map<String, String> kakaoAccount = (Map<String, String>) userInfo.get("kakao_account");
-        String email = kakaoAccount.get("email");
+        String useremail = kakaoAccount.get("email");
 
+        // 사용자 정보가 있으면 그 정보를 database에서 가져오고 없으면 새로 저장
         MemberVO user = userRepository.findByUserName(username);
         if (user == null) {
             user = new MemberVO();
             user.setUserName(username);
-            user.setEmail(email);
+            user.setUserEmail(useremail);
             userRepository.save(user);
         }
         return user;

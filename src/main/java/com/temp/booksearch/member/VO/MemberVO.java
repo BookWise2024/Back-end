@@ -6,16 +6,14 @@ import lombok.*;
 @Getter
 @Setter
 @Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name="Member")
 public class MemberVO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer userId;
+    private Long id;
 
     @Column(unique = true, nullable = false)
     private String userName;
     @Column(unique = true, nullable = false)
-    private String email;
+    private String userEmail;
 }
