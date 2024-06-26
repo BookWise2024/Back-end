@@ -1,38 +1,42 @@
 package com.example.bookwise.domain.library.service;
 
 
+import com.example.bookwise.domain.library.dto.*;
 import com.example.bookwise.domain.library.entity.Library;
 import com.example.bookwise.domain.library.repository.LibraryRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
+@Transactional(readOnly = true)
 public class LibraryService {
 
     private final LibraryRepository libraryRepository;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+    private final LibraryInitDBDto libraryInitDB;
 
-    @Value("${librarybigdata.api.key}")
-    private String authKey; //인증키
-    private String pageNo = "1"; //페이지 번호
-    private String pageSize = "319"; //페이지 사이즈
-    private String region = "11"; // 서울지역번호
-    private String format = "json"; // 포맷 형식
 
     /// 수정 필요 ///
     @Transactional
     public String createLibraryInitDB() throws Exception {
-
-
-        //    // 서울내 공공 도서관 : 206개 작은 도서관 : 113개
-        String urlStr = "http://data4library.kr/api/libSrch?authKey=" + authKey + "&pageNo=" + pageNo + "&pageSize=" + pageSize + "&region=" + region + "&format=" + format;
+        // 서울내 공공 도서관 : 206개 작은 도서관 : 113개
+        String urlStr = "http://data4library.kr/api/libSrch?authKey=" + libraryInitDB.getAuthKey()
+                + "&pageNo=" + libraryInitDB.getPageNo()
+                + "&pageSize=" + libraryInitDB.getPageSize()
+                + "&region=" + libraryInitDB.getRegion()
+                + "&format=" + libraryInitDB.getFormat();
 
         String response = restTemplate.getForObject(urlStr, String.class);
 
@@ -55,9 +59,46 @@ public class LibraryService {
             );
             libraryRepository.save(library);
         }
-
-
         return "SUCCESS";
+    }
+
+
+    public LibraryListResponse getLibraryByDistance(LibraryMapDto libraryMapDto) {
+
+        // 범위안에 있는 도서관들 조회
+        List<Library> libraries = libraryRepository.findLibrariesWithinDistance(libraryMapDto.getLatitude(), libraryMapDto.getLongitude(), libraryMapDto.getRange());
+
+        List<LibraryDistanceDto> libraryDtoList = new ArrayList<>();
+        for (Library l : libraries) {
+            double dis = Library.getDistance(libraryMapDto.getLatitude(), libraryMapDto.getLongitude(), l.getLatitude(), l.getLongitude());
+
+            libraryDtoList.add(LibraryDistanceDto.builder().libraryId(l.getLibraryId()).name(l.getName()).address(l.getAddress()).distance(Math.round(dis * 10) / 10.0).build());
+        }
+
+        // 가까운순으로 정렬
+        List<LibraryDistanceDto> result = libraryDtoList.stream().sorted((o1, o2) -> Double.compare(o1.getDistance(), o2.getDistance()))
+                .collect(Collectors.toList());
+
+        return new LibraryListResponse(result);
+    }
+
+
+    public LibraryDetailResponse getLibraryDetail(long libraryId) throws Exception {
+
+        Library library = libraryRepository.findByLibraryId(libraryId)
+                .orElseThrow(() -> new Exception("잘못된 정보입니다."));
+
+
+        LibraryDetailResponse libraryDetailResponse = LibraryDetailResponse.builder()
+                .name(library.getName())
+                .address(library.getAddress())
+                .url(library.getUrl())
+                .opTime(library.getOpTime())
+                .closeTime(library.getCloseTime())
+                .build();
+
+
+        return libraryDetailResponse;
     }
 
 }
