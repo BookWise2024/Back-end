@@ -1,0 +1,58 @@
+
+.header {
+  position: fixed;
+  
+  /* top: 0;
+  left: 50%;
+  transform: translateX(-50%); */
+
+  /* display: flex;
+  align-items: center;
+  width: 23.4375rem;
+  height: 3.5rem;
+  justify-content: center;
+  color: white;
+  gap: 6.6875rem;
+  font-weight: bold; */
+
+  display: flex;
+  width: 100%;
+  /* padding을 준 만큼 width, height 길이 제거 */
+  max-width: 21.4375rem;
+  height: 1.5rem;
+  padding: 1rem;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 6.6875rem;
+  flex-shrink: 0;
+
+  background: var(--main-color, #38ACFF);
+}
+
+.logo {
+  display: flex;
+  width: 1.5rem;
+  height: 1.5rem;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.icon {
+  /* display: flex;
+  width: 24px;
+  height: 24px;
+  margin-left:1;
+  margin-right:1; */
+
+  display: flex;
+  width: 1.5rem;
+  height: 1.5rem;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.icon, .logo:hover {
+  cursor: pointer;
+}

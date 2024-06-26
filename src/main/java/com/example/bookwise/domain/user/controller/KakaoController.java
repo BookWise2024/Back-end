@@ -82,4 +82,20 @@ public class KakaoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    // Login 여부 확인
+    @GetMapping("/check")
+    public ResponseEntity<UserVO> loginConfirm(HttpSession session) {
+        try {
+            UserVO user = (UserVO) session.getAttribute("user");
+            if (user == null) {
+                // user가 null일 때는 HttpStatus.UNAUTHORIZED 상태를 반환합니다.
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            }
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            log.error("Error during callback processing", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

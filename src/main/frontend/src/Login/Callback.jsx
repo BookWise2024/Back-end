@@ -15,11 +15,11 @@ const Callback = () => {
             if (code) {
                 try {
                     const response = await axios.post('http://localhost:8080/api/auth/kakao/callback',
-                        { code },
+                        { code }, 
                         { headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            withCredentials: true });
+                            'Content-Type': 'application/json'
+                        },
+                        withCredentials: true });
                     console.log(response.data); // 성공적으로 받은 사용자 데이터
                     navigate('/'); // 처리 후 원하는 경로로 이동
                 } catch (error) {
