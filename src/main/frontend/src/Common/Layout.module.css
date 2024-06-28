@@ -3,14 +3,17 @@
     --black : #000;
 }
 
+/* 기본 화면 */
 .layout {
     width: 23.4375rem;
     height: 41.6875rem;
 
     background: var(--white);
     overflow: hidden;
+    display: block;
 }
 
+/* hamberger menu 오픈 시 배경 */
 .oplayout {
     width: 23.4375rem;
     height: 41.6875rem;

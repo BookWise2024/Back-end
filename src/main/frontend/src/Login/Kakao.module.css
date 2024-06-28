@@ -1,54 +1,75 @@
 @font-face {
     font-family : "Jalnan 2";
-    src: url(../../font/Jalnan2TTF.ttf);
+    src: url(../assets/font/Jalnan2TTF.ttf);
 }
 @font-face {
     font-family : 'Pretendard';
-    src: url(../../font/PretendardVariable.ttf);
+    src: url(../assets/font/PretendardVariable.ttf);
 }
 
 :root{
     --white : #FFF;
     --black : #000;
+    --text_normal : #848484;
+}
+
+.exit {
+    display: flex;
+    height: 3.5rem;
+    padding: 1rem 1rem 1rem 20.9375rem;
+    /* justify-content: flex-end; */
+    align-items: center;
+    flex-shrink: 0;
+
+    background: var(--white);
+}
+
+.exitButton {
+    display: flex;
+    width: 1.5rem;
+    height: 1.5rem;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.exitButton:hover {
+    cursor: pointer;
 }
 
 .titleBase {
     display: inline-flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.0625rem;
+    gap: 1.5rem;
 
-    margin : 11rem 6.06rem 0rem 6.06rem;
+    margin : 3.69rem 7.44rem 0rem 7.5rem;
 }
 .subTitle {
-    color: var(--black);
-
+    color: var(--text_normal);
     font-family: "Jalnan 2";
-    font-size: 1rem;
+    font-size: 0.75rem;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
-    letter-spacing: 0.001rem;
-
-    width: 11.3125rem;
-    height: 1.1875rem;
+    letter-spacing: 0.00075rem;
 }
 .mainTitle {
-    color: #000;
-
-    font-family: "Jalnan 2";
-    font-size: 2.5rem;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    letter-spacing: 0.0025rem;
-
-    width: 5.0625rem;
-    height: 3rem;
-    margin-top: 1.06rem;
+    width: 8.0625rem;
+    height: 11rem;
 }
+
+.buttonBase {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+
+    margin: 8.25rem 1rem 0rem 1rem;
+}
+
 .desc {
-    color: #000;
+    color: var(--black);
 
     text-align: center;
     /* subtitle/subtitle3 M18 */
@@ -58,10 +79,11 @@
     font-weight: 500;
     line-height: 140%; /* 1.575rem */
 
-    margin : 5.37rem 5.06rem 0rem 5.12rem 
+    width: 13.25rem;
+    height: 3.125rem;
 }
 .kakaoButton {
-    display: inline-flex;
+    display: flex;
     padding: 1rem 4.4375rem;
     justify-content: center;
     align-items: center;
@@ -69,7 +91,7 @@
     border-radius: 0.5rem;
     background: #FAE100;
 
-    margin : 2.5rem 1rem 0rem 1rem;
+    padding: 1rem 4.34rem;
 }
 .buttonContent {
     display: flex;
@@ -79,19 +101,13 @@
 .kakaoImage {
     width: 1.5rem;
     height: 1.5rem;
-    background-image: url(../../images/login/kakao-svgrepo.svg);
-
-    margin-right: 0.38rem;
 }
 .buttonText {
     color: #1E1E1E;
 
-    font-family: 'Pretendard';
+    font-family:'Pretendard';
     font-size: 1rem;
     font-style: normal;
     font-weight: 500;
     line-height: 150%; /* 1.5rem */
-
-    width: 10.6875rem;
-    height: 1.5rem;
 }

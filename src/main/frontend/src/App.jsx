@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter, Route, Routes, Link } from 'react-router-dom'
 import axios from 'axios';
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+// import './App.module.css'
 import Login from './Login/Login.jsx';
 import MainPage from './MainPage/MainPage.jsx';
 import Callback from './Login/Callback.jsx';
 import SubMenu from './HambergerMenu/SubMenu.jsx';
+import Review from './Review/Review.jsx';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -24,13 +24,16 @@ function App() {
     <>
       <ul>
         <li><Link to = "/login">Kakao Login</Link></li>
+        <li><Link to = "/">Main Page</Link></li>
         <li><Link to = "/sub">Hamberger Menu</Link></li>
+        <li><Link to = "/review">Review Page</Link></li>
       </ul>
       <Routes>
         <Route path = "/login" element={<Login />}/>
-        <Route path = "/" element={<MainPage />}/>
         <Route path = "/auth/kakao/callback" element={<Callback />}/>
+        <Route path = "/" element={<MainPage />}/>
         <Route path = "/sub" element={<SubMenu />}/>
+        <Route path = "/review" element={<Review />}/>
       </Routes>
 
       {/* spring boot 연결 테스트 코드 */}

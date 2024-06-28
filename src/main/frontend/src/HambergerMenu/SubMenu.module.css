@@ -15,13 +15,12 @@
 
 .sublayout {
     width: 14.6875rem;
-    height: 39.4375rem;
+    height: 41.6875rem;
     flex-shrink: 0;
 
     /* background: var(--white); */
     background: var(--white);
 
-    margin-top: 2.25rem;
     margin-right: 9.75rem;
 
     overflow: hidden;
@@ -40,10 +39,6 @@
     margin: 2.06rem 2.31rem 0rem 1rem;
 }
 
-.identity:hover {
-    cursor: pointer;
-}
-
 .divide {
     width: 11.6875rem;
     height: 0.125rem;
@@ -60,17 +55,13 @@
     align-items: flex-start;
     gap: 0.75rem;
 
-    margin: 1.25rem 5.19rem 0rem 1rem;
+    margin: 1.25rem 5.44rem 0rem 1rem;
 }
 
 .menulist {
     display: flex;
     align-items: center;
     gap: 0.25rem;
-}
-
-.menulist:hover {
-    cursor: pointer;
 }
 
 .menutext {
@@ -87,7 +78,7 @@
     display: flex;
     width: 1.5rem;
     height: 1.5rem;
-    padding: 0.3125rem;
+    padding: 0.20831rem;
     justify-content: center;
     align-items: center;
 }
@@ -104,14 +95,10 @@
     gap: 0.25rem;
 
     /* 햄버거 메뉴 한개씩 늘어날 때마다 2.37rem씩 빼기 */
-    margin-top:21.94rem ;   
+    margin-top:28.19rem ;   
     margin-bottom: 1.19rem;
     margin-right: 7.87rem;
     margin-left: 1rem;
-}
-
-.logoutbutton:hover {
-    cursor: pointer;
 }
 
 .logouticon {
@@ -127,4 +114,8 @@
     width: 1.125rem;
     height: 1.0625rem;
     flex-shrink: 0;
+}
+
+.menulist, .identity, .logoutbutton:hover {
+    cursor: pointer;
 }

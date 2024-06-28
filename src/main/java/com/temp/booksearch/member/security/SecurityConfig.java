@@ -18,7 +18,6 @@ public class SecurityConfig{
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors().and() // CORS 설정 추가
                 .authorizeHttpRequests(authorize -> authorize
                         // 로그인 없이 모든 페이지의 요청을 혀용
 //                        .requestMatchers(new AntPathRequestMatcher("/**")).permitAll()

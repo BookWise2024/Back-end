@@ -5,6 +5,7 @@ import com.temp.booksearch.member.service.KakaoService;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,12 +49,6 @@ public class KakaoController {
 //        return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
 //    }
 
-//    // token만 가져오는 메소드
-//    @PostMapping("/api/auth/kakao/token")
-//    public Map<String, Object> getToken(@RequestParam String code) {
-//        return kakaoService.getToken(code);
-//    }
-
     @PostMapping("/api/auth/kakao/callback")
     public ResponseEntity<Void> callback(@RequestBody Map<String, String> requestBody, HttpSession session) {
         try {
@@ -82,6 +77,22 @@ public class KakaoController {
                     URI.create("http://localhost:5173/")); // 클라이언트가 이동할 경로 설정
 
             return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
+        } catch (Exception e) {
+            log.error("Error during callback processing", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // Login 여부 확인
+    @GetMapping("/check")
+    public ResponseEntity<MemberVO> loginConfirm(HttpSession session) {
+        try {
+            MemberVO user = (MemberVO) session.getAttribute("user");
+            if (user == null) {
+                // user가 null일 때는 HttpStatus.UNAUTHORIZED 상태를 반환합니다.
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            }
+            return ResponseEntity.ok(user);
         } catch (Exception e) {
             log.error("Error during callback processing", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
