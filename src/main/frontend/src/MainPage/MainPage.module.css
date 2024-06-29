@@ -1,0 +1,25 @@
+.container {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 26.25rem; /* 420px */
+    height: 11.4375rem; /* 183px */
+    gap: 1rem; /* 16px */
+
+    /* 3.875 + 3.5 + 1.5 */
+    margin-top: 8.875rem;
+    margin-left: 1rem;
+}
+  
+.list_container {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem; /* 8px */
+
+    overflow-x: scroll;
+}
+
+/* 스크롤바 제거 */
+.list_container::-webkit-scrollbar {
+    display: none;
+}
