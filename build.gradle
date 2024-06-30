@@ -45,9 +45,9 @@ dependencies {
 
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
-}
+//tasks.named('test') {
+//	useJUnitPlatform()
+//}
 
 // --------------------------------------------------------------------------------------
 // 빌드하기 -> 프론트와 같이 테스트하면서 설정
