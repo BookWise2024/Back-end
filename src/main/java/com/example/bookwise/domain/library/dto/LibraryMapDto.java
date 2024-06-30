@@ -1,12 +1,15 @@
 package com.example.bookwise.domain.library.dto;
 
+import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 
 @Data
 public class LibraryMapDto {
     Double latitude;
     Double longitude;
-    double range = 5L;
+    double range = 3L;
+    String sort = "distance";
+
+
 }
 

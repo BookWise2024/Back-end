@@ -2,6 +2,7 @@ package com.example.bookwise.domain.library.controller;
 
 
 import com.example.bookwise.domain.library.dto.LibraryDetailResponse;
+import com.example.bookwise.domain.library.dto.LibraryListByBookResponse;
 import com.example.bookwise.domain.library.dto.LibraryListResponse;
 import com.example.bookwise.domain.library.dto.LibraryMapDto;
 import com.example.bookwise.domain.library.service.LibraryService;
@@ -21,7 +22,7 @@ public class LibraryController {
     private final LibraryService libraryService;
 
 
-    // 위치기반 도서관 정보조회
+    // 도서관 위치조회
     @GetMapping
     public LibraryListResponse getLibraryList(LibraryMapDto libraryMapDto) {
         return libraryService.getLibraryByDistance(libraryMapDto);
@@ -32,6 +33,14 @@ public class LibraryController {
     @GetMapping("/{libraryId}")
     public LibraryDetailResponse getLibraryDetail(@PathVariable long libraryId) throws Exception {
         return libraryService.getLibraryDetail(libraryId);
+    }
+
+
+
+    // 도서관 위치조회 (도서정보기반)
+    @GetMapping("/book/{bookId}")
+    public LibraryListByBookResponse getLibraryListByBook(@PathVariable long bookId,LibraryMapDto libraryMapDto) throws Exception {
+        return libraryService.getLibraryByBook(bookId,libraryMapDto);
     }
 
 }

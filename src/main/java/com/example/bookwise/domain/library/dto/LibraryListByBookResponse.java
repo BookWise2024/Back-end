@@ -5,10 +5,11 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
-
 @Getter
 @Builder
 @AllArgsConstructor
-public class LibraryListResponse {
-    List<LibraryDistanceDto> libraryList;
+public class LibraryListByBookResponse {
+    List<LibraryDistanceByBookDto> libraryList;
+    
+
 }
