@@ -1,9 +1,14 @@
 package com.example.bookwise.domain.library.entity;
 
+import com.example.bookwise.domain.library.dto.LibraryInitDBDto;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.client.RestTemplate;
 
 @Getter
 @Entity
@@ -11,18 +16,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Library {
 
+
     @Id
     private Long libraryId;     // 도서관 코드
     private String name;        // 이름
     private String address;     //  주소
     private String url;         // 도서관 홈페이지 url
-    @Column(length=65535)
+    @Column(length = 65535)
     private String opTime;      // 운영시간
     private String closeTime;   // 공휴일
     private Double latitude;    // 위도
     private Double longitude;   // 경도
-
-
 
 
     // Haversine 공식 사용(km기준)
@@ -40,12 +44,10 @@ public class Library {
                 sinDeltaLat * sinDeltaLat +
                         Math.cos(x1 * toRadian) * Math.cos(x2 * toRadian) * sinDeltaLng * sinDeltaLng);
 
-        distance =  (2 * radius * Math.asin(squareRoot));
+        distance = (2 * radius * Math.asin(squareRoot));
 
         return distance;
     }
-
-
 
 
 }
