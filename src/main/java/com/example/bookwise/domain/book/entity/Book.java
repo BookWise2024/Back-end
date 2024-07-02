@@ -1,10 +1,13 @@
 package com.example.bookwise.domain.book.entity;
 
+import com.example.bookwise.domain.wishilist.entity.Wishlist;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @NoArgsConstructor
 @Data
@@ -31,6 +34,9 @@ public class Book {
     private String subcategory;
 
     private String description;
+
+    @OneToMany(mappedBy = "book",cascade = CascadeType.ALL)
+    private List<Wishlist> wishlist = new ArrayList<>();
 
     public Book(String bookId, String coverUrl, String title, String author, String styleDesc, String publishDate, String publisher, String category, String subcategory, String description ){
         this.bookId = bookId;
