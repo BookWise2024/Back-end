@@ -38,7 +38,8 @@ public class WishlistService {
 
     // 위시리스트 검색
     public WishlistResponse getWishlistBySearch(Long userId, String keyword) {
-        keyword = keyword.replace(" ", "");
+        keyword = keyword.trim();
+
         List<Wishlist> wishlist = wishlistRepository.findByUserUserIdAndBook_TitleContaining(userId, keyword);
         List<WishlistBookDto> result = new ArrayList<>();
         for (Wishlist list : wishlist) {
