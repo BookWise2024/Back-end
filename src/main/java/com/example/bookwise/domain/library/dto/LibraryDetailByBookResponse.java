@@ -1,5 +1,6 @@
 package com.example.bookwise.domain.library.dto;
 
+import com.example.bookwise.domain.book.dto.BookDetailDto;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,7 +9,8 @@ import lombok.Getter;
 public class LibraryDetailByBookResponse {
     LibraryDetailResponse library;
     // 책 데이터
-    // 리뷰 데이터 추가 긍정 : 3개, 부정 :3개
+    HasBookDetailDto book;
+
    // private List<SimilarBook> similarBooks;
 }
 

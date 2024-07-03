@@ -1,6 +1,8 @@
 package com.example.bookwise.domain.library.service;
 
 
+import com.example.bookwise.domain.book.entity.Book;
+import com.example.bookwise.domain.book.repository.BookRepository;
 import com.example.bookwise.domain.library.dto.*;
 import com.example.bookwise.domain.library.entity.Library;
 import com.example.bookwise.domain.library.repository.LibraryRepository;
@@ -28,6 +30,7 @@ public class LibraryService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final LibraryInitDBDto libraryInitDB;
+    private final BookRepository bookRepository;
 
 
     /// 수정 필요 ///
@@ -107,7 +110,7 @@ public class LibraryService {
 
 
     // 위치기반 도서관 조회(도서정보)
-    public LibraryListByBookResponse getLibraryByBook(long bookId, LibraryMapDto libraryMapDto) throws Exception {
+    public LibraryListByBookResponse getLibraryByBook(String bookId, LibraryMapDto libraryMapDto) throws Exception {
 
         // 범위안에 있는 도서관들 조회
         List<Library> libraries = libraryRepository.findLibrariesWithinDistance(libraryMapDto.getLatitude(), libraryMapDto.getLongitude(), libraryMapDto.getRange());
@@ -156,9 +159,51 @@ public class LibraryService {
         return new LibraryListByBookResponse(result);
     }
 
+    // 도서관 상세정보 조회(도서기반)
+    public LibraryDetailByBookResponse getLibraryDetailByBook(String bookId, long libraryId, HasBookDto hasBookDto) throws Exception {
+
+        Library library = libraryRepository.findByLibraryId(libraryId)
+                .orElseThrow(() -> new Exception("잘못된 정보입니다."));
+
+        Book book = bookRepository.findByBookId(bookId).orElseThrow();
+
+        HasBookDetailDto dto = HasBookDetailDto.builder().bookId(book.getBookId())
+                .coverUrl(book.getCoverUrl())
+                .title(book.getTitle())
+                .author(book.getAuthor())
+                .styleDesc(book.getStyleDesc())
+                .publishDate(book.getPublishDate())
+                .publisher(book.getPublisher())
+                .category(book.getCategory())
+                .subcategory(book.getSubcategory())
+                .description(book.getDescription())
+                .hasBook(hasBookDto.getHasBook())
+                .loanAvailable(hasBookDto.getLoanAvailable())
+                .build();
+
+
+        LibraryDetailResponse libraryDetailResponse = LibraryDetailResponse.builder()
+                .name(library.getName())
+                .address(library.getAddress())
+                .url(library.getUrl())
+                .opTime(library.getOpTime())
+                .closeTime(library.getCloseTime())
+                .build();
+
+        LibraryDetailByBookResponse libraryDetailByBookResponse = LibraryDetailByBookResponse.builder()
+                .library(libraryDetailResponse)
+                .book(dto)
+                //      .similarBooks()     비슷한 책 리스트 만들면 추가
+                .build();
+
+
+        return libraryDetailByBookResponse;
+    }
+
 
     // 보유,대출 가능한지 확인코드
-    public HasBookDto getHasBook(Long bookId, Long libraryId) throws Exception {
+    public HasBookDto getHasBook(String bookId, Long libraryId) throws Exception {
+
         String urlStr = "http://data4library.kr/api/bookExist?authKey=" + libraryInitDB.getAuthKey()
                 + "&libCode=" + libraryId
                 + "&isbn13=" + bookId

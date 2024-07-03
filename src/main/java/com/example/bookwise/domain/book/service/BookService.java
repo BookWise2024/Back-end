@@ -18,13 +18,13 @@ public class BookService {
     @Value("${aladin.api.key}")
     private String apiKey;
 
-    private final RestTemplate restTemplate;
-    private final ObjectMapper objectMapper;
+            private final RestTemplate restTemplate;
+            private final ObjectMapper objectMapper;
 
 
-    public ResponseEntity<?> getBookDetails(String isbn) throws IOException {
-
-        // url에 api 키 와 isbn 동적으로 삽입 ( json 형식으로 받아옴 )
+            public ResponseEntity<?> getBookDetails(String isbn) throws IOException {
+        //
+        //        // url에 api 키 와 isbn 동적으로 삽입 ( json 형식으로 받아옴 )
         String apiUrl = String.format("https://www.aladin.co.kr/ttb/api/ItemLookUp.aspx?ttbkey=%s&itemIdType=ISBN&ItemId=%s&output=js&Version=20131101", apiKey, isbn);
         String response = restTemplate.getForObject(apiUrl, String.class); // 지정 url 로 get 요청
 

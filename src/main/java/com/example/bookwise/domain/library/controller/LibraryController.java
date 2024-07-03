@@ -1,17 +1,11 @@
 package com.example.bookwise.domain.library.controller;
 
 
-import com.example.bookwise.domain.library.dto.LibraryDetailResponse;
-import com.example.bookwise.domain.library.dto.LibraryListByBookResponse;
-import com.example.bookwise.domain.library.dto.LibraryListResponse;
-import com.example.bookwise.domain.library.dto.LibraryMapDto;
+import com.example.bookwise.domain.library.dto.*;
 import com.example.bookwise.domain.library.service.LibraryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -39,8 +33,16 @@ public class LibraryController {
 
     // 도서관 위치조회 (도서정보기반)
     @GetMapping("/book/{bookId}")
-    public LibraryListByBookResponse getLibraryListByBook(@PathVariable long bookId,LibraryMapDto libraryMapDto) throws Exception {
+    public LibraryListByBookResponse getLibraryListByBook(@PathVariable String bookId,LibraryMapDto libraryMapDto) throws Exception {
         return libraryService.getLibraryByBook(bookId,libraryMapDto);
+    }
+
+
+    // 도서관 상세정보 조회 (도서정보기반)
+    @GetMapping("/book/{bookId}/{libraryId}")
+    public LibraryDetailByBookResponse getLibraryListByBook(@PathVariable String bookId,@PathVariable Long libraryId, @RequestParam("has-book") String hasBook, @RequestParam("loan-available") String loanAvailable) throws Exception {
+        HasBookDto hasBookDto = new HasBookDto(hasBook,loanAvailable);
+        return libraryService.getLibraryDetailByBook(bookId,libraryId,hasBookDto);
     }
 
 }
