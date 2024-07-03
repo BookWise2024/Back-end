@@ -1,10 +1,12 @@
 package com.example.bookwise.domain.wishcategory.service;
 
+import com.example.bookwise.domain.book.dto.BookByMlDto;
 import com.example.bookwise.domain.user.entity.User;
 import com.example.bookwise.domain.user.repository.UserRepository;
 import com.example.bookwise.domain.wishcategory.entity.Wishcategory;
 import com.example.bookwise.domain.wishcategory.repository.WishcategoryRepository;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,23 +15,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 
-import java.util.Arrays;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class WishcategoryService {
 
-    @Value("${aladin.api.key}")
-    private String apiKey;
 
     private final WishcategoryRepository wishcategoryRepository;
     private final UserRepository userRepository;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+
+
+    @Value("${url.ml}")
+    private  String url;
 
 
     // 위시카테고리생성
@@ -82,6 +87,62 @@ public class WishcategoryService {
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
+
+
+    // 카페고리 높은 2개 보내고 추천 도서들 받기
+    public List<BookByMlDto> getBooksByCategoryCount(Long userId) throws IOException {
+        List<Wishcategory> wishcategoryList = wishcategoryRepository.findByUser_UserId(userId);
+
+        // count 기준으로 오름차순 정렬되는 PriorityQueue 생성
+        PriorityQueue<Wishcategory> priorityQueue = new PriorityQueue<>(2, (w1, w2) -> Long.compare(w1.getCount(), w2.getCount()));
+
+        for (Wishcategory wishcategory : wishcategoryList) {
+            priorityQueue.offer(wishcategory);
+            if (priorityQueue.size() > 2) {
+                priorityQueue.poll(); // 최소 값을 제거하여 상위 2개의 요소만 유지
+            }
+        }
+
+        // ML 서버 URL 설정
+
+        String urlStr = UriComponentsBuilder.fromHttpUrl(url)
+                .path("/api/recommend/wishlist/count")
+                .queryParam("preferred_cateogries", priorityQueue.poll().getCategory())
+                .queryParam("preferred_cateogries", priorityQueue.poll().getCategory())
+                .toUriString();
+
+        return parseJsonResponse(restTemplate.getForObject(urlStr, String.class));
+    }
+
+    // isbn 보내고 비슷한 도서들 받기
+    public List<BookByMlDto> getSimilarBook(String bookId) throws IOException {
+
+        // ML 서버 URL 설정
+        String urlStr = UriComponentsBuilder.fromHttpUrl(url)
+                .path("/api/recommend/similar/"+bookId)
+                .toUriString();
+
+        return parseJsonResponse(restTemplate.getForObject(urlStr, String.class));
+    }
+
+
+    public List<BookByMlDto> parseJsonResponse(String response) throws IOException {
+        List<BookByMlDto> bookList = new ArrayList<>();
+
+
+        JsonNode rootNode = objectMapper.readTree(response);
+        Iterator<Map.Entry<String, JsonNode>> fields = rootNode.fields();
+
+        while (fields.hasNext()) {
+            Map.Entry<String, JsonNode> field = fields.next();
+            String isbn = field.getKey();
+            String coverUrl = field.getValue().asText();
+
+            bookList.add(new BookByMlDto(isbn, coverUrl));
+        }
+
+        return bookList;
+    }
 
 
 

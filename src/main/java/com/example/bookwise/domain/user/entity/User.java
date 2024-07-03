@@ -6,6 +6,7 @@ import com.example.bookwise.domain.wishcategory.repository.WishcategoryRepositor
 import com.example.bookwise.domain.wishilist.entity.Wishlist;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +17,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User {
 
     @Id

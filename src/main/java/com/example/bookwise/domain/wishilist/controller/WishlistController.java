@@ -13,6 +13,8 @@ import com.example.bookwise.domain.wishilist.entity.Wishlist;
 import com.example.bookwise.domain.wishilist.entity.WishlistId;
 import com.example.bookwise.domain.wishilist.repository.WishlistRepository;
 import com.example.bookwise.domain.wishilist.service.WishlistService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,7 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/wishlist")
+@Tag(name = "위시리스트")
 public class WishlistController {
 
 
@@ -38,6 +41,7 @@ public class WishlistController {
     private final WishcategoryService wishcategoryService;
 
     // 아이디는 로그인 구현 이후에 변경 //
+    @Operation(summary = "위시리스트 조회", description = "유저 위시리스트의 도서들을 조회합니다.")
     @GetMapping
     public WishlistResponse getLibraryList() {
 
@@ -47,6 +51,7 @@ public class WishlistController {
 
 
     // 아이디는 로그인 구현 이후에 변경 //
+    @Operation(summary = "위시리스트 검색", description = "키워드로 검색하면 일치하는 유저 위시리스트의 도서들을 조회합니다.")
     @GetMapping("/search")
     public WishlistResponse getWishlistBySearch(Long userId, String keyword) {
         return wishlistService.getWishlistBySearch(userId,keyword);

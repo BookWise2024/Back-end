@@ -1,11 +1,14 @@
 package com.example.bookwise.domain.library.service;
 
 
+import com.example.bookwise.domain.book.dto.BookByMlDto;
 import com.example.bookwise.domain.book.entity.Book;
 import com.example.bookwise.domain.book.repository.BookRepository;
 import com.example.bookwise.domain.library.dto.*;
 import com.example.bookwise.domain.library.entity.Library;
 import com.example.bookwise.domain.library.repository.LibraryRepository;
+import com.example.bookwise.domain.wishcategory.entity.Wishcategory;
+import com.example.bookwise.domain.wishcategory.repository.WishcategoryRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +31,7 @@ public class LibraryService {
     private final ObjectMapper objectMapper;
     private final LibraryInitDBDto libraryInitDB;
     private final BookRepository bookRepository;
+    private final WishcategoryRepository wishcategoryRepository;
 
 
     /// 수정 필요 ///
@@ -139,6 +140,7 @@ public class LibraryService {
             }
         }
 
+        // 거리,보유순에 따라 정렬시키기
         List<LibraryDistanceByBookDto> result = new ArrayList<>();
         if (libraryMapDto.getSort().equals("possession")) {
             while (!yBookQueue.isEmpty()) {
@@ -199,6 +201,8 @@ public class LibraryService {
 
         return libraryDetailByBookResponse;
     }
+
+
 
 
     // 보유,대출 가능한지 확인코드
