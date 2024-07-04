@@ -23,6 +23,8 @@ public class LibraryController {
     @Operation(summary = "도서관 위치조회", description = "도서관 위치를 조회합니다.")
     @GetMapping
     public LibraryListResponse getLibraryList(LibraryMapDto libraryMapDto) {
+
+        log.info("도서관 위치조회");
         return libraryService.getLibraryByDistance(libraryMapDto);
     }
 
