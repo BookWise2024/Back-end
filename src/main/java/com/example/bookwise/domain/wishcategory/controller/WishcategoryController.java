@@ -24,22 +24,21 @@ public class WishcategoryController {
     // 테스트용 삭제예정
     @GetMapping("/inreasment")
     public ResponseEntity<?> increaseWishcategory() throws IOException {
-        wishcategoryService.increaseWishcategory(1L,"과학");
-        wishcategoryService.increaseWishcategory(1L,"과학");
-        wishcategoryService.increaseWishcategory(1L,"과학");
-        wishcategoryService.increaseWishcategory(1L,"만화");
-        wishcategoryService.increaseWishcategory(1L,"만화");
+        wishcategoryService.increaseWishcategory(1L, "과학");
+        wishcategoryService.increaseWishcategory(1L, "과학");
+        wishcategoryService.increaseWishcategory(1L, "과학");
+        wishcategoryService.increaseWishcategory(1L, "만화");
+        wishcategoryService.increaseWishcategory(1L, "만화");
 
 
-        return wishcategoryService.increaseWishcategory(1L,"소설/시/희곡");
+        return wishcategoryService.increaseWishcategory(1L, "소설/시/희곡");
     }
 
     // 테스트용 삭제예정
     @GetMapping("/decreasment")
     public ResponseEntity<?> decreaseWishcategory() throws IOException {
-        return wishcategoryService.decreaseWishcategory(1L,"소설/시/희곡");
+        return wishcategoryService.decreaseWishcategory(1L, "소설/시/희곡");
     }
-
 
 
     // ML 받는거 테스트
@@ -51,7 +50,7 @@ public class WishcategoryController {
 
 
     // ML 받는거 테스트2
-    @GetMapping("/test2")
+    @GetMapping("/test1")
     public List<BookByMlDto> getSimilarBook() throws Exception {
         Long userId = 1L;
 
@@ -61,17 +60,28 @@ public class WishcategoryController {
 
 
     // ML 받는거 테스트
-    @GetMapping("/test1")
+    @GetMapping("/test2")
     public List<BookByMlDto> getLibraryListByBooktest() throws Exception {
         Long userId = 1L;
-        String str = "{\n" +
-                "    \"9789876543210\": \"https://example.com/cover31.jpg\",\n" +
-                "    \"9782345678901\": \"https://example.com/cover32.jpg\",\n" +
-                "    \"9783456789012\": \"https://example.com/cover33.jpg\"\n" +
-                "}";
 
-        return wishcategoryService.parseJsonResponse(str);
+        String str ="[{\"isbn\": \"9789876543210\", \"cover\": \"https://example.com/cover31.jpg\"}, {\"isbn\": \"9781234567890\", \"cover\": \"https://example.com/cover32.jpg\"}]";
+
+
+
+//        String str = "{\n" +
+//                "    \"9789876543210\": \"https://example.com/cover31.jpg\",\n" +
+//                "    \"9782345678901\": \"https://example.com/cover32.jpg\",\n" +
+//                "    \"9783456789012\": \"https://example.com/cover33.jpg\"\n" +
+//                "}";
+
+//        String str = "{\n" +
+//                "    \"9789876543210\": \"https://example.com/cover31.jpg\",\n" +
+//                "    \"9782345678901\": \"https://example.com/cover32.jpg\",\n" +
+//                "    \"9783456789012\": \"https://example.com/cover33.jpg\"\n" +
+//                "}";
+
+            return wishcategoryService.parseJsonResponse(str);
+
+        }
+
     }
-
-
-}

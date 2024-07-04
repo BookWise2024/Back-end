@@ -69,7 +69,6 @@ public class WishlistController {
         userRepository.save(user);
         userRepository.save(user1);
 
-
         User u = userRepository.findByUserId(1L).orElseThrow();
         User u1 = userRepository.findByUserId(2L).orElseThrow();
 

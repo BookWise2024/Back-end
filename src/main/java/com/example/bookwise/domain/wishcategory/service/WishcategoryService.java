@@ -6,9 +6,11 @@ import com.example.bookwise.domain.user.repository.UserRepository;
 import com.example.bookwise.domain.wishcategory.entity.Wishcategory;
 import com.example.bookwise.domain.wishcategory.repository.WishcategoryRepository;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Service
+@Slf4j
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class WishcategoryService {
@@ -104,42 +107,49 @@ public class WishcategoryService {
         }
 
         // ML 서버 URL 설정
-
         String urlStr = UriComponentsBuilder.fromHttpUrl(url)
                 .path("/api/recommend/wishlist/count")
-                .queryParam("preferred_cateogries", priorityQueue.poll().getCategory())
-                .queryParam("preferred_cateogries", priorityQueue.poll().getCategory())
+                .queryParam("preferred_cateogries", "경제경영")
+                .queryParam("preferred_cateogries", "인문학")
                 .toUriString();
-
-        return parseJsonResponse(restTemplate.getForObject(urlStr, String.class));
+        String response = restTemplate.getForObject(urlStr, String.class);
+        System.out.println(response);
+        log.info(response);
+        return parseJsonResponse(response);
     }
 
     // isbn 보내고 비슷한 도서들 받기
     public List<BookByMlDto> getSimilarBook(String bookId) throws IOException {
 
+
+        String id = "9788934921318";
         // ML 서버 URL 설정
         String urlStr = UriComponentsBuilder.fromHttpUrl(url)
-                .path("/api/recommend/similar/"+bookId)
+                .path("/api/recommend/similar/"+id)
                 .toUriString();
 
-        return parseJsonResponse(restTemplate.getForObject(urlStr, String.class));
+        String response = restTemplate.getForObject(urlStr, String.class);
+        System.out.println(response);
+        log.info(response);
+        return parseJsonResponse(response);
     }
 
 
     public List<BookByMlDto> parseJsonResponse(String response) throws IOException {
         List<BookByMlDto> bookList = new ArrayList<>();
 
+        bookList = objectMapper.readValue(response, new TypeReference<List<BookByMlDto>>() {});
 
-        JsonNode rootNode = objectMapper.readTree(response);
-        Iterator<Map.Entry<String, JsonNode>> fields = rootNode.fields();
-
-        while (fields.hasNext()) {
-            Map.Entry<String, JsonNode> field = fields.next();
-            String isbn = field.getKey();
-            String coverUrl = field.getValue().asText();
-
-            bookList.add(new BookByMlDto(isbn, coverUrl));
-        }
+//        JsonNode rootNode = objectMapper.readTree(response);
+//        Iterator<Map.Entry<String, JsonNode>> fields = rootNode.fields();
+//
+//        while (fields.hasNext()) {
+//            Map.Entry<String, JsonNode> field = fields.next();
+//            String isbn = field.getKey();
+//            String coverUrl = field.getValue().asText();
+//
+//            bookList.add(new BookByMlDto(isbn, coverUrl));
+//        }
 
         return bookList;
     }
