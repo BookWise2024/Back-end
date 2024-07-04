@@ -9,7 +9,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class LibraryInitDBDto {
     @Value("${librarybigdata.api.key}")
-    private String authKey; //인증키
+    private String libraryBigdataKey; //도서관정보나루 인증키
+
+    @Value("${seoullibrary.api.key}")
+    private String seoulLibraryKey; // 서울공공도서관 인증키
     private String pageNo = "1"; //페이지 번호
     private String pageSize = "319"; //페이지 사이즈
     private String region = "11"; // 서울지역번호

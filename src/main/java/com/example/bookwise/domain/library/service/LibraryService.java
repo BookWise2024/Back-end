@@ -11,12 +11,20 @@ import com.example.bookwise.domain.wishcategory.entity.Wishcategory;
 import com.example.bookwise.domain.wishcategory.repository.WishcategoryRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.Column;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,14 +39,16 @@ public class LibraryService {
     private final ObjectMapper objectMapper;
     private final LibraryInitDBDto libraryInitDB;
     private final BookRepository bookRepository;
-    private final WishcategoryRepository wishcategoryRepository;
 
 
     /// 수정 필요 ///
     @Transactional
     public String createLibraryInitDB() throws Exception {
-        // 서울내 공공 도서관 : 206개 작은 도서관 : 113개
-        String urlStr = "http://data4library.kr/api/libSrch?authKey=" + libraryInitDB.getAuthKey()
+
+        long beforeTime = System.currentTimeMillis(); //코드 실행 전에 시간 받아오기
+
+
+        String urlStr = "http://data4library.kr/api/libSrch?authKey=" + libraryInitDB.getLibraryBigdataKey()
                 + "&pageNo=" + libraryInitDB.getPageNo()
                 + "&pageSize=" + libraryInitDB.getPageSize()
                 + "&region=" + libraryInitDB.getRegion()
@@ -50,23 +60,66 @@ public class LibraryService {
         JsonNode responseNode = rootNode.get("response");
         JsonNode libsNode = responseNode.get("libs");
 
+        List<LibraryComparisonDto> libraryList = new ArrayList<>();
+
         for (JsonNode libNode : libsNode) {
             JsonNode info = libNode.get("lib");
 
-            Library library = new Library(
+            LibraryComparisonDto libraryComparisonDto = new LibraryComparisonDto(
                     info.get("libCode").asLong(),
-                    info.get("libName").asText(),
-                    info.get("address").asText(),
-                    info.get("homepage").asText(),
-                    info.get("operatingTime").asText(),
-                    info.get("closed").asText(),
-                    info.get("latitude").asDouble(),
-                    info.get("longitude").asDouble()
+                    info.get("libName").asText().replace(" ", ""),
+                    info.get("address").asText().replace(" ", ""),
+                    info.get("homepage").asText().replace(" ", ""),
+                    info.get("tel").asText().replace(" ", "")
             );
-            libraryRepository.save(library);
+
+            libraryList.add(libraryComparisonDto);
+
         }
-        return "SUCCESS";
+
+        String urlSt = "http://openapi.seoul.go.kr:8088/" + libraryInitDB.getSeoulLibraryKey()
+                + "/" + libraryInitDB.getFormat()
+                + "/SeoulPublicLibraryInfo/" + libraryInitDB.getPageNo()
+                + "/" + libraryInitDB.getPageSize() + "/";
+
+
+        String res = restTemplate.getForObject(urlSt, String.class);
+
+        JsonNode root = objectMapper.readTree(res);
+        JsonNode SeoulPublicLibraryInfo = root.get("SeoulPublicLibraryInfo");
+        JsonNode rows = SeoulPublicLibraryInfo.get("row");
+
+        for (JsonNode info : rows) {
+            String name = info.get("LBRRY_NAME").asText();
+            String address = info.get("ADRES").asText();
+            String url = info.get("HMPG_URL").asText();
+            String opTime = info.get("OP_TIME").asText();
+            String closeTime = info.get("FDRM_CLOSE_DATE").asText();
+            Double latitude = info.get("XCNTS").asDouble();
+            Double longitude = info.get("YDNTS").asDouble();
+            String tel = info.get("TEL_NO").asText();
+
+
+            for (int i = 0; i < libraryList.size(); i++) {
+                LibraryComparisonDto dto = libraryList.get(i);
+                if (dto.getName().equals(name.replace(" ", "")) || dto.getAddress().equals(address.replace(" ", "")) || dto.getUrl().equals(url.replace(" ", "")) || dto.getTel().equals(tel.replace(" ", ""))) {
+                    Library library = new Library(dto.getLibraryId(), name, address, url, opTime, closeTime, latitude, longitude);
+                    libraryRepository.save(library);
+                    libraryList.remove(i);
+                }
+
+            }
+
+        }
+
+
+        long afterTime = System.currentTimeMillis(); // 코드 실행 후에 시간 받아오기
+        long secDiffTime = (afterTime - beforeTime) / 1000; //두 시간에 차 계산
+        System.out.println("시간차이(m) : " + secDiffTime);
+
+        return "Success";
     }
+
 
     // 위치 기반 도서관 조회
     public LibraryListResponse getLibraryByDistance(LibraryMapDto libraryMapDto) {
@@ -203,12 +256,10 @@ public class LibraryService {
     }
 
 
-
-
     // 보유,대출 가능한지 확인코드
     public HasBookDto getHasBook(String bookId, Long libraryId) throws Exception {
 
-        String urlStr = "http://data4library.kr/api/bookExist?authKey=" + libraryInitDB.getAuthKey()
+        String urlStr = "http://data4library.kr/api/bookExist?authKey=" + libraryInitDB.getLibraryBigdataKey()
                 + "&libCode=" + libraryId
                 + "&isbn13=" + bookId
                 + "&format=" + libraryInitDB.getFormat();
