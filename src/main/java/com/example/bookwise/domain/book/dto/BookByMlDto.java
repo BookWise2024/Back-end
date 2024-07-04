@@ -8,6 +8,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class BookByMlDto {
 
-    private String isbn;
-    private String coverUrl;
+    private String isbn13;
+    private String cover;
 }
