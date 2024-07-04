@@ -32,12 +32,7 @@ public class WishcategoryService {
 
     private final WishcategoryRepository wishcategoryRepository;
     private final UserRepository userRepository;
-    private final RestTemplate restTemplate;
-    private final ObjectMapper objectMapper;
 
-
-    @Value("${url.ml}")
-    private  String url;
 
 
     // 위시카테고리생성
@@ -55,7 +50,7 @@ public class WishcategoryService {
         //
         User user = userRepository.findByUserId(userId).orElseThrow();
         for (String category : categories) {
-            Wishcategory wishcategory = new Wishcategory(category,user);
+            Wishcategory wishcategory = new Wishcategory(category, user);
 
             wishcategoryRepository.save(wishcategory);
         }
@@ -63,97 +58,30 @@ public class WishcategoryService {
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-    // 위시카테고리 증가
-    @Transactional
-    public ResponseEntity<String> increaseWishcategory(Long userId,String category) {
-
-        Wishcategory wishcategory = wishcategoryRepository.findByUser_UserIdAndCategory(userId,category).orElseThrow();
-
-        wishcategory.increase();
-
-        wishcategoryRepository.save(wishcategory);
-
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
-    }
-
-
-
-    // 위시카테고리 감소
-    @Transactional
-    public ResponseEntity<String> decreaseWishcategory(Long userId,String category) {
-
-        Wishcategory wishcategory = wishcategoryRepository.findByUser_UserIdAndCategory(userId,category).orElseThrow();
-
-        wishcategory.decrease();
-
-        wishcategoryRepository.save(wishcategory);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
-    }
-
-
-
-    // 카페고리 높은 2개 보내고 추천 도서들 받기
-    public List<BookByMlDto> getBooksByCategoryCount(Long userId) throws IOException {
-        List<Wishcategory> wishcategoryList = wishcategoryRepository.findByUser_UserId(userId);
-
-        // count 기준으로 오름차순 정렬되는 PriorityQueue 생성
-        PriorityQueue<Wishcategory> priorityQueue = new PriorityQueue<>(2, (w1, w2) -> Long.compare(w1.getCount(), w2.getCount()));
-
-        for (Wishcategory wishcategory : wishcategoryList) {
-            priorityQueue.offer(wishcategory);
-            if (priorityQueue.size() > 2) {
-                priorityQueue.poll(); // 최소 값을 제거하여 상위 2개의 요소만 유지
-            }
-        }
-
-        // ML 서버 URL 설정
-        String urlStr = UriComponentsBuilder.fromHttpUrl(url)
-                .path("/api/recommend/wishlist/count")
-                .queryParam("preferred_cateogries", "경제경영")
-                .queryParam("preferred_cateogries", "인문학")
-                .toUriString();
-        String response = restTemplate.getForObject(urlStr, String.class);
-        System.out.println(response);
-        log.info(response);
-        return parseJsonResponse(response);
-    }
-
-    // isbn 보내고 비슷한 도서들 받기
-    public List<BookByMlDto> getSimilarBook(String bookId) throws IOException {
-
-
-        String id = "9788934921318";
-        // ML 서버 URL 설정
-        String urlStr = UriComponentsBuilder.fromHttpUrl(url)
-                .path("/api/recommend/similar/"+id)
-                .toUriString();
-
-        String response = restTemplate.getForObject(urlStr, String.class);
-        System.out.println(response);
-        log.info(response);
-        return parseJsonResponse(response);
-    }
-
-
-    public List<BookByMlDto> parseJsonResponse(String response) throws IOException {
-        List<BookByMlDto> bookList = new ArrayList<>();
-
-        bookList = objectMapper.readValue(response, new TypeReference<List<BookByMlDto>>() {});
-
-//        JsonNode rootNode = objectMapper.readTree(response);
-//        Iterator<Map.Entry<String, JsonNode>> fields = rootNode.fields();
+//    // 위시카테고리 증가
+//    @Transactional
+//    public ResponseEntity<String> increaseWishcategory(Long userId, String category) {
 //
-//        while (fields.hasNext()) {
-//            Map.Entry<String, JsonNode> field = fields.next();
-//            String isbn = field.getKey();
-//            String coverUrl = field.getValue().asText();
+//        Wishcategory wishcategory = wishcategoryRepository.findByUser_UserIdAndCategory(userId, category).orElseThrow();
 //
-//            bookList.add(new BookByMlDto(isbn, coverUrl));
-//        }
+//        wishcategory.increase();
+//
+//        wishcategoryRepository.save(wishcategory);
+//
+//        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+//    }
 
-        return bookList;
-    }
-
-
+//
+//    // 위시카테고리 감소
+//    @Transactional
+//    public ResponseEntity<String> decreaseWishcategory(Long userId, String category) {
+//
+//        Wishcategory wishcategory = wishcategoryRepository.findByUser_UserIdAndCategory(userId, category).orElseThrow();
+//
+//        wishcategory.decrease();
+//
+//        wishcategoryRepository.save(wishcategory);
+//        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+//    }
 
 }
