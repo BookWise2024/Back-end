@@ -10,10 +10,12 @@ import com.example.bookwise.domain.user.repository.UserRepository;
 import com.example.bookwise.domain.wishcategory.service.WishcategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OAuthLoginService {
     private final AuthTokensGenerator authTokensGenerator;
     private final RequestOAuthInfoService requestOAuthInfoService;

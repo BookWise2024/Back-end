@@ -2,6 +2,7 @@ package com.example.bookwise.domain.library.service;
 
 
 import com.example.bookwise.domain.book.dto.BookByMlDto;
+import com.example.bookwise.domain.book.dto.BookDetailDto;
 import com.example.bookwise.domain.book.entity.Book;
 import com.example.bookwise.domain.book.repository.BookRepository;
 import com.example.bookwise.domain.library.dto.*;
@@ -44,8 +45,6 @@ public class LibraryService {
     /// 수정 필요 ///
     @Transactional
     public String createLibraryInitDB() throws Exception {
-
-        long beforeTime = System.currentTimeMillis(); //코드 실행 전에 시간 받아오기
 
 
         String urlStr = "http://data4library.kr/api/libSrch?authKey=" + libraryInitDB.getLibraryBigdataKey()
@@ -112,11 +111,6 @@ public class LibraryService {
 
         }
 
-
-        long afterTime = System.currentTimeMillis(); // 코드 실행 후에 시간 받아오기
-        long secDiffTime = (afterTime - beforeTime) / 1000; //두 시간에 차 계산
-        System.out.println("시간차이(m) : " + secDiffTime);
-
         return "Success";
     }
 
@@ -131,7 +125,13 @@ public class LibraryService {
         for (Library l : libraries) {
             double dis = Library.getDistance(libraryMapDto.getLatitude(), libraryMapDto.getLongitude(), l.getLatitude(), l.getLongitude());
 
-            libraryDtoList.add(LibraryDistanceDto.builder().libraryId(l.getLibraryId()).name(l.getName()).address(l.getAddress()).distance(Math.round(dis * 10) / 10.0).build());
+            libraryDtoList.add(LibraryDistanceDto.builder()
+                    .libraryId(l.getLibraryId())
+                    .name(l.getName())
+                    .address(l.getAddress())
+                    .distance(Math.round(dis * 10) / 10.0)
+                    .latitude(l.getLatitude())
+                    .longitude(l.getLongitude()).build());
         }
 
         // 가까운순으로 정렬
@@ -150,16 +150,15 @@ public class LibraryService {
                 .orElseThrow(() -> new Exception("잘못된 정보입니다."));
 
 
-        LibraryDetailResponse libraryDetailResponse = LibraryDetailResponse.builder()
+        return LibraryDetailResponse.builder()
                 .name(library.getName())
                 .address(library.getAddress())
                 .url(library.getUrl())
                 .opTime(library.getOpTime())
                 .closeTime(library.getCloseTime())
+                .latitude(library.getLatitude())
+                .longitude(library.getLongitude())
                 .build();
-
-
-        return libraryDetailResponse;
     }
 
 
@@ -183,6 +182,8 @@ public class LibraryService {
                     .name(l.getName())
                     .address(l.getAddress())
                     .distance(Math.round(dis * 10) / 10.0)
+                    .latitude(l.getLatitude())
+                    .longitude(l.getLongitude())
                     .hasBook(hasBook.getHasBook())
                     .loanAvailable(hasBook.getLoanAvailable())
                     .build();
@@ -243,7 +244,10 @@ public class LibraryService {
                 .url(library.getUrl())
                 .opTime(library.getOpTime())
                 .closeTime(library.getCloseTime())
+                .latitude(library.getLatitude())
+                .longitude(library.getLongitude())
                 .build();
+
 
         LibraryDetailByBookResponse libraryDetailByBookResponse = LibraryDetailByBookResponse.builder()
                 .library(libraryDetailResponse)

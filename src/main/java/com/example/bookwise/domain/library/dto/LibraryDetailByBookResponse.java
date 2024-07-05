@@ -4,6 +4,8 @@ import com.example.bookwise.domain.book.dto.BookDetailDto;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 @Builder
 public class LibraryDetailByBookResponse {
@@ -11,7 +13,7 @@ public class LibraryDetailByBookResponse {
     // 책 데이터
     HasBookDetailDto book;
 
-   // private List<SimilarBook> similarBooks;
+    private List<BookDetailDto> similarBooks;
 }
 
 

@@ -14,4 +14,6 @@ public class LibraryDetailResponse {
     private String url;
     private String opTime;
     private String closeTime;
+    private double latitude;    // 위도
+    private double longitude;   // 경도
 }
