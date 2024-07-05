@@ -53,7 +53,7 @@ public class JwtTokenProvider {
 
 //    public boolean vaildAccessToken(String accessToken) {
 //        try {
-//            Claims claims =  Jwts.parser()
+//            Claims claims =  Jwts.parserBuilder()
 //                    .setSigningKey(secretKey)
 //                    .parseClaimsJws(accessToken)
 //                    .getBody();
@@ -67,7 +67,7 @@ public class JwtTokenProvider {
 //
 //    public boolean vaildRefreshToken(String refreshToken) {
 //        try {
-//            Claims claims = Jwts.parser()
+//            Claims claims = Jwts.parserBuilder()
 //                    .setSigningKey(secretKey)
 //                    .parseClaimsJws(refreshToken)
 //                    .getBody();
