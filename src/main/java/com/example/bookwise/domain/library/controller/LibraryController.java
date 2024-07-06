@@ -54,7 +54,4 @@ public class LibraryController {
         return libraryService.getLibraryDetailByBook(bookId,libraryId,hasBookDto);
     }
 
-
-
-
 }

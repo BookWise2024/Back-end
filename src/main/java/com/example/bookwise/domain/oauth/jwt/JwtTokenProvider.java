@@ -54,7 +54,7 @@ public class JwtTokenProvider {
 //    public boolean vaildAccessToken(String accessToken) {
 //        try {
 //            Claims claims =  Jwts.parserBuilder()
-//                    .setSigningKey(secretKey)
+//                    .setSigningKey(key)
 //                    .parseClaimsJws(accessToken)
 //                    .getBody();
 //            return true;  //유효하다면 true 반환
@@ -64,18 +64,18 @@ public class JwtTokenProvider {
 //            return false;
 //        }
 //    }
-//
-//    public boolean vaildRefreshToken(String refreshToken) {
+
+//    public boolean vaildRefreshToken(String refreshToken) throws Exception {
 //        try {
 //            Claims claims = Jwts.parserBuilder()
-//                    .setSigningKey(secretKey)
+//                    .setSigningKey(key)
 //                    .parseClaimsJws(refreshToken)
 //                    .getBody();
 //            return true;  //유효하다면 true 반환
 //        } catch (MalformedJwtException e) {
-//            throw new RestApiException(ErrorCode.UNAUTHORIZED_REQUEST);
+//            throw new Exception();
 //        } catch (ExpiredJwtException e) {
-//            throw new RestApiException(ErrorCode.VALID_TOKEN_EXPIRED);
+//            throw new Exception();
 //        }
 //    }
 }
