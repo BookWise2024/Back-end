@@ -1,0 +1,97 @@
+@font-face {
+    font-family : "Jalnan 2";
+    src: url(../assets/font/Jalnan2TTF.ttf);
+}
+@font-face {
+    font-family : 'Pretendard';
+    src: url(../assets/font/PretendardVariable.ttf);
+}
+
+:root{
+    --white : #FFF;
+    --black : #000;
+}
+
+.titleBase {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.0625rem;
+
+    margin : 11rem 6.06rem 0rem 6.06rem;
+}
+.subTitle {
+    color: var(--black);
+
+    font-family: "Jalnan 2";
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    letter-spacing: 0.001rem;
+
+    width: 11.3125rem;
+    height: 1.1875rem;
+}
+.mainTitle {
+    color: #000;
+
+    font-family: "Jalnan 2";
+    font-size: 2.5rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    letter-spacing: 0.0025rem;
+
+    width: 5.0625rem;
+    height: 3rem;
+    margin-top: 1.06rem;
+}
+.desc {
+    color: #000;
+
+    text-align: center;
+    /* subtitle/subtitle3 M18 */
+    font-family: 'Pretendard';
+    font-size: 1.125rem;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 140%; /* 1.575rem */
+
+    margin : 5.37rem 5.06rem 0rem 5.12rem
+}
+.kakaoButton {
+    display: inline-flex;
+    padding: 1rem 4.4375rem;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 0.5rem;
+    background: #FAE100;
+
+    margin : 2.5rem 1rem 0rem 1rem;
+}
+.buttonContent {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.375rem;
+}
+.kakaoImage {
+    width: 1.5rem;
+    height: 1.5rem;
+    background-image: url(../assets/images/login/kakao-svgrepo.svg);
+
+    margin-right: 0.38rem;
+}
+.buttonText {
+    color: #1E1E1E;
+
+    font-family: 'Pretendard';
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 150%; /* 1.5rem */
+
+    width: 10.6875rem;
+    height: 1.5rem;
+}
