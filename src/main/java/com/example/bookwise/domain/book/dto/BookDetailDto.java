@@ -11,22 +11,14 @@ import lombok.NoArgsConstructor;
 public class BookDetailDto {
 
     private String bookId;
-
     private String coverUrl;
-
     private String title;
-
     private String author;
-
     private String styleDesc;
-
     private String publishDate;
-
     private String publisher;
-
     private String category;
-
     private String subcategory;
-
     private String description;
+    private String itemId;
 }
