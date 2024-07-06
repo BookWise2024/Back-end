@@ -1,9 +1,9 @@
 package com.example.bookwise.domain.user.service;
 
 
+import com.example.bookwise.domain.oauth.jwt.JwtTokenProvider;
 import com.example.bookwise.domain.user.dto.UserResponse;
 import com.example.bookwise.domain.user.entity.User;
-import com.example.bookwise.domain.oauth.jwt.JwtTokenProvider;
 import com.example.bookwise.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

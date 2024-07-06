@@ -19,6 +19,7 @@ public class Book {
 
    private String coverUrl;
 
+    @Column(length = 1000)
     private String title;
 
     private String author;
@@ -33,6 +34,7 @@ public class Book {
 
     private String subcategory;
 
+    @Column(length = 3000)
     private String description;
 
     @OneToMany(mappedBy = "book",cascade = CascadeType.ALL)

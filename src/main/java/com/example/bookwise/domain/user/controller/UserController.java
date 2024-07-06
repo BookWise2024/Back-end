@@ -1,7 +1,7 @@
 package com.example.bookwise.domain.user.controller;
 
-import com.example.bookwise.domain.user.dto.UserResponse;
 import com.example.bookwise.domain.oauth.jwt.JwtTokenProvider;
+import com.example.bookwise.domain.user.dto.UserResponse;
 import com.example.bookwise.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

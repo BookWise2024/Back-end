@@ -15,15 +15,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.Column;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -40,80 +45,6 @@ public class LibraryService {
     private final ObjectMapper objectMapper;
     private final LibraryInitDBDto libraryInitDB;
     private final BookRepository bookRepository;
-
-
-    /// 수정 필요 ///
-    @Transactional
-    public String createLibraryInitDB() throws Exception {
-
-
-        String urlStr = "http://data4library.kr/api/libSrch?authKey=" + libraryInitDB.getLibraryBigdataKey()
-                + "&pageNo=" + libraryInitDB.getPageNo()
-                + "&pageSize=" + libraryInitDB.getPageSize()
-                + "&region=" + libraryInitDB.getRegion()
-                + "&format=" + libraryInitDB.getFormat();
-
-        String response = restTemplate.getForObject(urlStr, String.class);
-
-        JsonNode rootNode = objectMapper.readTree(response);
-        JsonNode responseNode = rootNode.get("response");
-        JsonNode libsNode = responseNode.get("libs");
-
-        List<LibraryComparisonDto> libraryList = new ArrayList<>();
-
-        for (JsonNode libNode : libsNode) {
-            JsonNode info = libNode.get("lib");
-
-            LibraryComparisonDto libraryComparisonDto = new LibraryComparisonDto(
-                    info.get("libCode").asLong(),
-                    info.get("libName").asText().replace(" ", ""),
-                    info.get("address").asText().replace(" ", ""),
-                    info.get("homepage").asText().replace(" ", ""),
-                    info.get("tel").asText().replace(" ", "")
-            );
-
-            libraryList.add(libraryComparisonDto);
-
-        }
-
-        String urlSt = "http://openapi.seoul.go.kr:8088/" + libraryInitDB.getSeoulLibraryKey()
-                + "/" + libraryInitDB.getFormat()
-                + "/SeoulPublicLibraryInfo/" + libraryInitDB.getPageNo()
-                + "/" + libraryInitDB.getPageSize() + "/";
-
-
-        String res = restTemplate.getForObject(urlSt, String.class);
-
-        JsonNode root = objectMapper.readTree(res);
-        JsonNode SeoulPublicLibraryInfo = root.get("SeoulPublicLibraryInfo");
-        JsonNode rows = SeoulPublicLibraryInfo.get("row");
-
-        for (JsonNode info : rows) {
-            String name = info.get("LBRRY_NAME").asText();
-            String address = info.get("ADRES").asText();
-            String url = info.get("HMPG_URL").asText();
-            String opTime = info.get("OP_TIME").asText();
-            String closeTime = info.get("FDRM_CLOSE_DATE").asText();
-            Double latitude = info.get("XCNTS").asDouble();
-            Double longitude = info.get("YDNTS").asDouble();
-            String tel = info.get("TEL_NO").asText();
-
-
-            for (int i = 0; i < libraryList.size(); i++) {
-                LibraryComparisonDto dto = libraryList.get(i);
-                if (dto.getName().equals(name.replace(" ", "")) || dto.getAddress().equals(address.replace(" ", "")) || dto.getUrl().equals(url.replace(" ", "")) || dto.getTel().equals(tel.replace(" ", ""))) {
-                    Library library = new Library(dto.getLibraryId(), name, address, url, opTime, closeTime, latitude, longitude);
-                    libraryRepository.save(library);
-                    libraryList.remove(i);
-                }
-
-            }
-
-        }
-
-        return "Success";
-    }
-
 
     // 위치 기반 도서관 조회
     public LibraryListResponse getLibraryByDistance(LibraryMapDto libraryMapDto) {

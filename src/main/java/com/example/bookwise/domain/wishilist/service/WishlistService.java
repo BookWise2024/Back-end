@@ -1,18 +1,14 @@
 package com.example.bookwise.domain.wishilist.service;
 
 
-import com.example.bookwise.domain.book.entity.Book;
-import com.example.bookwise.domain.book.repository.BookRepository;
 import com.example.bookwise.domain.oauth.jwt.JwtTokenProvider;
 import com.example.bookwise.domain.user.entity.User;
 import com.example.bookwise.domain.user.repository.UserRepository;
 import com.example.bookwise.domain.wishilist.dto.WishlistBookDto;
 import com.example.bookwise.domain.wishilist.dto.WishlistResponse;
 import com.example.bookwise.domain.wishilist.entity.Wishlist;
-import com.example.bookwise.domain.wishilist.entity.WishlistId;
 import com.example.bookwise.domain.wishilist.repository.WishlistRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +28,11 @@ public class WishlistService {
 
     // 위시리스트 조회
     public WishlistResponse getWishlist(String accessToken) {
+
+//        if(!jwtTokenProvider.isValidAccessToken(accessToken)) {
+//            throw new IllegalStateException("유효하지 않은 회원입니다.");
+//        }
+
         Long userId = jwtTokenProvider.extractId(accessToken);
         User user = userRepository.findById(userId)
                 .orElseThrow();
@@ -49,7 +50,14 @@ public class WishlistService {
     }
 
     // 위시리스트 검색
-    public WishlistResponse getWishlistBySearch(Long userId, String keyword) {
+    public WishlistResponse getWishlistBySearch(String accessToken, String keyword) {
+//        if(!jwtTokenProvider.isValidAccessToken(accessToken)) {
+//            throw new IllegalStateException("유효하지 않은 회원입니다.");
+//        }
+
+        Long userId = jwtTokenProvider.extractId(accessToken);
+
+
         keyword = keyword.trim();
 
         List<Wishlist> wishlist = wishlistRepository.findByUserUserIdAndBook_TitleContaining(userId, keyword);
