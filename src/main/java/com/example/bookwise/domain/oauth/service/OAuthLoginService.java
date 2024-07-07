@@ -38,7 +38,7 @@ public class OAuthLoginService {
     private Long newUser(OAuthInfoResponse oAuthInfoResponse) {
 
 
-        User user = User.builder().email(oAuthInfoResponse.getEmail()).build();
+        User user = User.builder().email(oAuthInfoResponse.getEmail()).nickname(oAuthInfoResponse.getNickname()).build();
         Long userId = userRepository.save(user).getUserId();
 
         wishcategoryService.createWishcategory(userId);

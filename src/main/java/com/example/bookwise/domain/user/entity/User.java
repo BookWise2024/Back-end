@@ -25,6 +25,7 @@ public class User {
     private Long userId;
 
     private String email;
+    private String nickname;
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private List<Wishlist> wishlist = new ArrayList<>();
@@ -32,8 +33,9 @@ public class User {
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private List<Wishcategory> wishcategoryList = new ArrayList<>();
 
-    public User(Long userId,String email) {
+    public User(Long userId,String email,String nickname) {
         this.userId = userId;
         this.email = email;
+        this.nickname =nickname;
     }
 }
