@@ -10,6 +10,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Getter
 @Entity
@@ -42,4 +43,9 @@ public class Wishlist {
 
     }
 
+    public Wishlist(User user, Book book1) {
+        this.book = book1;
+        this.user = user;
+        this.wishlistId = new WishlistId(user.getUserId(), book1.getBookId());
+    }
 }

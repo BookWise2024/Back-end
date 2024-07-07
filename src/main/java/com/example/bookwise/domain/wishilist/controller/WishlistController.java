@@ -31,13 +31,12 @@ import java.io.IOException;
 @Tag(name = "위시리스트")
 public class WishlistController {
 
-
-
     private final WishlistService wishlistService;
 
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
     private final WishlistRepository wishlistRepository;
+
 
 
 
