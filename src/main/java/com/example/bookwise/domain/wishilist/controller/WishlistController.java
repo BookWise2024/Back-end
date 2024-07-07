@@ -66,7 +66,7 @@ public class WishlistController {
     @PostMapping("/dummydb")
     public ResponseEntity<String> createDummyDB() {
 
-        User user = new User(1L,"aa@naver.com");
+        User user = new User(1L,"aa@naver.com","nickname");
 
         userRepository.save(user);
 

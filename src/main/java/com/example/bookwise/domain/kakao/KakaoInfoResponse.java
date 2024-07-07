@@ -15,10 +15,19 @@ public class KakaoInfoResponse implements OAuthInfoResponse {
     @JsonProperty("kakao_account")
     private KakaoEmail kakaoEmail;
 
+    @JsonProperty("properties")
+    private KakaoNickname kakaoNickname;
+
     @Getter
     @JsonIgnoreProperties(ignoreUnknown = true)
     static class KakaoEmail {
         private String email;
+    }
+
+    @Getter
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    static class KakaoNickname {
+        private String nickname;
     }
 
 
@@ -29,6 +38,12 @@ public class KakaoInfoResponse implements OAuthInfoResponse {
     @Override
     public String getEmail() {
         return kakaoEmail.getEmail();
+    }
+
+
+    @Override
+    public String getNickname() {
+        return kakaoNickname.getNickname();
     }
 
 }
