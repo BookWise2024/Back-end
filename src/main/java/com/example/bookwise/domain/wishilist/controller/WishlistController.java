@@ -30,11 +30,10 @@ import java.io.IOException;
 @Tag(name = "위시리스트")
 public class WishlistController {
 
-
-
     private final WishlistService wishlistService;
 
     private final BookRepository bookRepository;
+
 
 
     // 아이디는 로그인 구현 이후에 변경 //

@@ -1,12 +1,10 @@
 package com.example.bookwise.domain.book.controller;
 
 import com.example.bookwise.domain.book.service.BookService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -17,8 +15,17 @@ public class BookController {
 
     private final BookService bookService;
 
-    @GetMapping("/{isbn}")
-    public ResponseEntity<?> getBookDetail(@PathVariable String isbn) throws IOException {
-        return bookService.getBookDetails(isbn);
+    @GetMapping("/{isbn}/{user_id}")
+    public ResponseEntity<?> getBookDetail(@PathVariable("isbn") String isbn, @PathVariable("user_id") Long userId) throws IOException {
+        return bookService.getBookDetails(isbn, userId);
+    }
+
+    @PostMapping("/{isbn}/{user_id}/like")
+    public ResponseEntity<String> addWishlist(@PathVariable("user_id") Long userId, @PathVariable("isbn") String isbn) throws JsonProcessingException {
+        return bookService.addWishlist(isbn, userId);
+    }
+    @DeleteMapping("/{isbn}/{user_id}/like")
+    public ResponseEntity<String> deleteWishlist(@PathVariable("user_id") Long userId, @PathVariable("isbn") String isbn) throws JsonProcessingException {
+        return bookService.deleteWishlist(isbn, userId);
     }
 }

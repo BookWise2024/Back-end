@@ -1,5 +1,6 @@
 package com.example.bookwise.domain.book.entity;
 
+import com.example.bookwise.domain.book.dto.BookDetailDto;
 import com.example.bookwise.domain.wishilist.entity.Wishlist;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -51,4 +52,16 @@ public class Book {
         this.description = description;
     }
 
+    public Book(BookDetailDto bookAladin) {
+        this.bookId = bookAladin.getBookId();
+        this.description = bookAladin.getDescription();
+        this.subcategory = bookAladin.getSubcategory();
+        this.category = bookAladin.getCategory();
+        this.coverUrl = bookAladin.getCoverUrl();
+        this.publisher = bookAladin.getPublisher();
+        this.styleDesc =bookAladin.getStyleDesc();
+        this.publishDate = bookAladin.getPublishDate();
+        this.title = bookAladin.getTitle();
+        this.author = bookAladin.getAuthor();
+    }
 }
