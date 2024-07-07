@@ -28,4 +28,9 @@ public class BookController {
     public ResponseEntity<String> deleteWishlist(@PathVariable("user_id") Long userId, @PathVariable("isbn") String isbn) throws JsonProcessingException {
         return bookService.deleteWishlist(isbn, userId);
     }
+
+    @GetMapping("/recommendations/{user_id}")
+    public ResponseEntity<?> getBookList(@PathVariable("user_id") Long userId){
+        return bookService.getBookList(userId);
+    }
 }

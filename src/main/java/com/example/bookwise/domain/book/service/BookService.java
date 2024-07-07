@@ -1,9 +1,11 @@
 package com.example.bookwise.domain.book.service;
 
-import com.example.bookwise.domain.book.dto.BookByMlDto;
-import com.example.bookwise.domain.book.dto.BookDetailDto;
+import com.example.bookwise.domain.book.dto.*;
 import com.example.bookwise.domain.book.entity.Book;
 import com.example.bookwise.domain.book.repository.BookRepository;
+import com.example.bookwise.domain.bookclick.entity.BookClick;
+import com.example.bookwise.domain.bookclick.repository.BookClickRepository;
+import com.example.bookwise.domain.bookclick.service.BookClickService;
 import com.example.bookwise.domain.user.entity.User;
 import com.example.bookwise.domain.user.repository.UserRepository;
 import com.example.bookwise.domain.wishcategory.entity.Wishcategory;
@@ -39,8 +41,10 @@ public class BookService {
     @Value("${url.ml}")
     private String url;
 
+    private final BookClickService bookClickService;
     private final WishcategoryRepository wishcategoryRepository;
     private final WishcategoryService wishcategoryService;
+    private final BookClickRepository bookClickRepository;
     private final WishlistRepository wishlistRepository;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
@@ -87,10 +91,11 @@ public class BookService {
                 itemId
         );
 
-        sendItemIdToDataTeam(itemId);
+       // sendItemIdToDataTeam(itemId);
         // 상세조회시 위시 카테고리 up
-
         wishcategoryService.increaseWishcategory(userId,mainCategory);
+        // 클릭 수 up
+        bookClickService.clickBook(userId, isbn);
 
         return ResponseEntity.ok(bookDetailDto);
     }
@@ -169,7 +174,6 @@ public class BookService {
             book = new Book(findBookAladin(isbn));
             bookRepository.save(book);
         }
-
         // 위시리스트 생성
         Wishlist wishlist = new Wishlist(user, book);
         wishlistRepository.save(wishlist); // 위시리스트 저장
@@ -235,4 +239,45 @@ public class BookService {
         return bookDetailDto;
     }
 
+    public ResponseEntity<?> getBookList(Long userId) {
+
+       List<Wishlist> wishlists = wishlistRepository.findByUserUserId(userId);
+       ArrayList<String> bookList = new ArrayList<>();
+
+       for(Wishlist wishlist : wishlists){
+           bookList.add(wishlist.getBook().getBookId());
+       }
+
+
+       List<BookWishCategoryDto> bookWishCategoryDtos = new ArrayList<>();
+       List<Wishcategory> wishCateorys = wishcategoryRepository.findByUser_UserId(userId);
+       for(Wishcategory wishcategory : wishCateorys){
+           BookWishCategoryDto bw = new BookWishCategoryDto(wishcategory);
+          bookWishCategoryDtos.add(bw);
+       }
+
+
+       List<BookClickDto> bookClickDtos = new ArrayList<>();
+       List<BookClick> bookClick = bookClickRepository.findByUserUserId(userId);
+
+       for(BookClick bookClick1 : bookClick){
+           BookClickDto bt = new BookClickDto(bookClick1);
+           bookClickDtos.add(bt);
+       }
+
+       // 유저 선호책, 카레고리, 책별 클릭수
+        BookRecommendDto br = new BookRecommendDto(bookList, bookWishCategoryDtos, bookClickDtos );
+
+        // ML 서버 URL 설정
+        String urlStr = UriComponentsBuilder.fromHttpUrl(url)
+                .path("/api/recommend/recommendations")
+                .toUriString();
+
+
+      //  ResponseEntity<String> response = restTemplate.postForEntity(urlStr, br, String.class);
+      //  log.info(String.valueOf(response));
+        // 응답 반환
+     //   return ResponseEntity.ok(response.getBody());
+        return ResponseEntity.ok(br);
+    }
 }

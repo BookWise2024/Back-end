@@ -35,6 +35,7 @@ public class Book {
     private String subcategory;
 
     private String description;
+    private String itemId;
 
     @OneToMany(mappedBy = "book",cascade = CascadeType.ALL)
     private List<Wishlist> wishlist = new ArrayList<>();
