@@ -91,11 +91,11 @@ public class BookService {
                 itemId
         );
 
-       // sendItemIdToDataTeam(itemId);
-        // 상세조회시 위시 카테고리 up
-        wishcategoryService.increaseWishcategory(userId,mainCategory);
-        // 클릭 수 up
-        bookClickService.clickBook(userId, isbn);
+//       // sendItemIdToDataTeam(itemId);
+//        // 상세조회시 위시 카테고리 up
+//        wishcategoryService.increaseWishcategory(userId,mainCategory);
+//        // 클릭 수 up
+//        bookClickService.clickBook(userId, isbn);
 
         return ResponseEntity.ok(bookDetailDto);
     }
