@@ -54,6 +54,7 @@ public class BookService {
 
     public ResponseEntity<?> getBookDetails(String isbn, Long userId) throws IOException {
 
+
         Optional<Book> isBook = bookRepository.findByBookId(isbn);
 
         Book book = null;
@@ -68,7 +69,7 @@ public class BookService {
         }
 
         // 책 클릭수 증가
-        bookClickService.clickBook(userId, isbn);
+        if(userId != -1L) bookClickService.clickBook(userId, isbn);
 
         BookDetailDto bookDetailDto = new BookDetailDto(book.getBookId(),book.getCoverUrl(),book.getTitle(),book.getAuthor(),book.getStyleDesc(),book.getPublishDate(),book.getPublisher(),book.getCategory(), book.getSubcategory(),book.getDescription());
 
@@ -147,9 +148,6 @@ public class BookService {
 //                }
 //            }
 
-            System.out.println("첫번째:"+categoryFirst+"두번째: "+categorySecond);
-            System.out.println("첫번째:"+ categoryFirst.getCategory()+"두번째: "+categorySecond.getCategory());
-
             // ML 서버 URL 설정
             String urlStr = UriComponentsBuilder.fromHttpUrl(url)
                     .path("/api/recommend/wishlist/count")
@@ -157,7 +155,6 @@ public class BookService {
                     .queryParam("preferred_categories",categorySecond.getCategory())
                     .toUriString();
 
-            System.out.println(urlStr);
             String response = restTemplate.getForObject(urlStr, String.class);
             log.info("category 기반 : {}", response);
 
@@ -309,7 +306,7 @@ public class BookService {
 
             // 유저 선호책 ,책별 클릭수 로 데이터 받아오기
             BookRecommendDto br = new BookRecommendDto(bookList, bookClickDtos);
-            System.out.println("prefe : " + br.getUser_preferences().toString() + "click : " + br.getBookClickDtos().toString());
+//            System.out.println("prefe : " + br.getUser_preferences().toString() + "click : " + br.getBookClickDtos().toString());
 
             // ML 서버 URL 설정
             String urlStr = UriComponentsBuilder.fromHttpUrl(url)
@@ -323,7 +320,7 @@ public class BookService {
             List<BookByMlDto> booksByRecommend = objectMapper.readValue(jsonResponse, new TypeReference<List<BookByMlDto>>() {});
 
 
-            System.out.println("isbn:"+booksByRecommend.get(0).getIsbn13()+" cover}"+booksByRecommend.get(0).getCoverURL());
+//            System.out.println("isbn:"+booksByRecommend.get(0).getIsbn13()+" cover}"+booksByRecommend.get(0).getCoverURL());
 
 
 
