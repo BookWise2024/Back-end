@@ -24,7 +24,7 @@ public class BookController {
 
 
     @GetMapping("/{isbn}")
-    public ResponseEntity<?> getBookDetail(@RequestHeader("Authorization") String accessToken,@PathVariable("isbn") String isbn) throws IOException {
+    public ResponseEntity<?> getBookDetail(@RequestHeader("Authorization") String accessToken,@PathVariable("isbn") String isbn) throws Exception {
         Long userId;
         if(!accessToken.equals("")) {
              userId = jwtTokenProvider.extractId(accessToken);

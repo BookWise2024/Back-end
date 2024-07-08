@@ -28,7 +28,6 @@ public class LibraryController {
         return libraryService.getLibraryByDistance(libraryMapDto);
     }
 
-
     // 도서관 상세정보 조회
     @Operation(summary = "도서관 상세정보 조회", description = "도서관의 상세정보를 조회합니다.")
     @GetMapping("/{libraryId}")
