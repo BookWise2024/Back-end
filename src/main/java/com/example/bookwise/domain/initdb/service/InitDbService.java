@@ -52,7 +52,7 @@ public class InitDbService {
         for (Row row : sheet) {
 
 
-            Book book = new Book(getCellValue(row,4), getCellValue(row,6), getCellValue(row,0),getCellValue(row,1), getCellValue(row,9), getCellValue(row,2),getCellValue(row,8), getCellValue(row,6), getCellValue(row,7), getCellValue(row,3)
+            Book book = new Book(getCellValue(row,4), getCellValue(row,6), getCellValue(row,0),getCellValue(row,1), getCellValue(row,10), getCellValue(row,2),getCellValue(row,9), getCellValue(row,7), getCellValue(row,8), getCellValue(row,3),getCellValue(row,5)
             );
             bookRepository.save(book);
         }

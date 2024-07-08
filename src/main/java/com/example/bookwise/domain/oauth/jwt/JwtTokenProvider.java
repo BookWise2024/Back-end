@@ -1,9 +1,10 @@
 package com.example.bookwise.domain.oauth.jwt;
 
-import com.example.bookwise.global.error.ErrorCode;
+import com.example.bookwise.domain.redis.RedisUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -11,11 +12,15 @@ import java.security.Key;
 import java.util.Date;
 
 @Component
+@Slf4j
 public class JwtTokenProvider {
 
     private final Key key;
 
-    public JwtTokenProvider(@Value("${jwt.secret-key}") String secretKey) {
+    private final RedisUtil redisUtil;
+
+    public JwtTokenProvider(@Value("${jwt.secret-key}") String secretKey, RedisUtil redisUtil) {
+        this.redisUtil = redisUtil;
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
@@ -46,36 +51,76 @@ public class JwtTokenProvider {
             return e.getClaims();
         }
     }
+
     public Long extractId(String accessToken) {
+        if (!validAccessToken(accessToken)) {
+            throw new JwtException("JwtError");
+        }
+
+
         String subject = extractSubject(accessToken);
         return Long.parseLong(subject);
     }
 
-//    public boolean vaildAccessToken(String accessToken) {
-//        try {
-//            Claims claims =  Jwts.parserBuilder()
-//                    .setSigningKey(key)
-//                    .parseClaimsJws(accessToken)
-//                    .getBody();
-//            return true;  //유효하다면 true 반환
-//        } catch (MalformedJwtException e) {
-//            return false;
-//        } catch (ExpiredJwtException e) {
-//            return false;
-//        }
-//    }
+    public boolean validAccessToken(String accessToken) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(accessToken);
+            if(redisUtil.hasKeyBlackList(accessToken)) {        // 로그아웃 끝난 토큰
+                log.info("로그아웃된 토큰입니다.");
+                return false;
+            }
+            return true;  //유효하다면 true 반환
+        } catch (MalformedJwtException e) {
+            log.info("잘못된 JWT 서명입니다.");
+            return false;
+        } catch (UnsupportedJwtException e) {
+            log.info("지원되지 않는 토큰입니다.");
+            return false;
+        } catch(ExpiredJwtException e){
+            log.info("만료된 토큰입니다.");
+            return false;
+        } catch (IllegalArgumentException e) {
+            log.info("토큰이 잘못되었습니다.");
+            return false;
+    }
+    }
 
-//    public boolean vaildRefreshToken(String refreshToken) throws Exception {
-//        try {
-//            Claims claims = Jwts.parserBuilder()
-//                    .setSigningKey(key)
-//                    .parseClaimsJws(refreshToken)
-//                    .getBody();
-//            return true;  //유효하다면 true 반환
-//        } catch (MalformedJwtException e) {
-//            throw new Exception();
-//        } catch (ExpiredJwtException e) {
-//            throw new Exception();
-//        }
-//    }
+    public boolean validRefreshToken(String refreshToken) throws Exception {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(refreshToken)
+                    .getBody();
+            return true;  //유효하다면 true 반환
+        } catch (MalformedJwtException e) {
+            throw new Exception();
+        } catch (ExpiredJwtException e) {
+            throw new Exception();
+        }
+    }
+
+    public Long getExpiration(String accessToken) {
+        Claims claims= Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(accessToken)
+                .getBody();
+        return claims.getExpiration().getTime();
+    }
+
+
+
+
+    private String getUsername(String accessToken) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(accessToken)
+                .getBody()
+                .getSubject();
+    }
 }

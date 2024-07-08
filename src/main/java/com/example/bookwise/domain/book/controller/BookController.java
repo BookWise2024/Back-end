@@ -1,7 +1,10 @@
 package com.example.bookwise.domain.book.controller;
 
+import com.example.bookwise.domain.book.dto.BookByMlDto;
 import com.example.bookwise.domain.book.service.BookService;
+import com.example.bookwise.domain.oauth.jwt.JwtTokenProvider;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,23 +17,48 @@ import java.io.IOException;
 public class BookController {
 
     private final BookService bookService;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    @GetMapping("/{isbn}/{user_id}")
-    public ResponseEntity<?> getBookDetail(@PathVariable("isbn") String isbn, @PathVariable("user_id") Long userId) throws IOException {
+    @GetMapping("/{isbn}")
+    public ResponseEntity<?> getBookDetail(@RequestHeader("Authorization") String accessToken,@PathVariable("isbn") String isbn) throws IOException {
+        Long userId = jwtTokenProvider.extractId(accessToken);
         return bookService.getBookDetails(isbn, userId);
     }
 
-    @PostMapping("/{isbn}/{user_id}/like")
-    public ResponseEntity<String> addWishlist(@PathVariable("user_id") Long userId, @PathVariable("isbn") String isbn) throws JsonProcessingException {
+    @PostMapping("/{isbn}/like")
+    public ResponseEntity<String> addWishlist(@RequestHeader("Authorization") String accessToken, @PathVariable("isbn") String isbn) throws JsonProcessingException {
+        Long userId = jwtTokenProvider.extractId(accessToken);
         return bookService.addWishlist(isbn, userId);
     }
-    @DeleteMapping("/{isbn}/{user_id}/like")
-    public ResponseEntity<String> deleteWishlist(@PathVariable("user_id") Long userId, @PathVariable("isbn") String isbn) throws JsonProcessingException {
+    @DeleteMapping("/{isbn}/like")
+    public ResponseEntity<String> deleteWishlist(@RequestHeader("Authorization") String accessToken, @PathVariable("isbn") String isbn) throws JsonProcessingException {
+        Long userId = jwtTokenProvider.extractId(accessToken);
+
         return bookService.deleteWishlist(isbn, userId);
     }
 
-    @GetMapping("/recommendations/{user_id}")
-    public ResponseEntity<?> getBookList(@PathVariable("user_id") Long userId){
+    @Operation(summary = "유저 기반 추천 도서")
+    @GetMapping("/recommendations")
+    public ResponseEntity<?> getBookList(@RequestHeader("Authorization") String accessToken) throws IOException {
+
+        Long userId = jwtTokenProvider.extractId(accessToken);
+
         return bookService.getBookList(userId);
     }
+
+    @Operation(summary = "비슷한 도서")
+    @GetMapping("/similar/{isbn}")
+    public ResponseEntity<?> getSimilarBookList(@PathVariable("isbn") String isbn) throws IOException {
+        return bookService.getSimilarBook(isbn);
+    }
+
+
+    @Operation(summary = "리뷰데이터")
+    @GetMapping("/review/{item}")
+    public ResponseEntity<?> getReviewData(@PathVariable("item") String itemId) throws IOException {
+        return bookService.getItemIdToDataTeam(itemId);
+    }
+
+
+
 }

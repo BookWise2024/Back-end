@@ -36,9 +36,10 @@ public class AuthController {
     // 미완성
     @Operation(summary = "로그아웃")
     @PostMapping("/logout")
-    public String logout(@RequestHeader("Authorization") String authorization) {
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String accessToken) throws Exception {
 
-        return oAuthLogoutService.logout(authorization);
+        oAuthLogoutService.logout(accessToken);
+        return ResponseEntity.ok("로그아웃 완료");
     }
 
 
