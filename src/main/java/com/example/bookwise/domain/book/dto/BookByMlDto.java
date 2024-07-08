@@ -9,5 +9,5 @@ import lombok.Getter;
 public class BookByMlDto {
 
     private String isbn13;
-    private String cover;
+    private String coverURL;
 }

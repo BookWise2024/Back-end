@@ -42,7 +42,7 @@ public class Book {
     @OneToMany(mappedBy = "book",cascade = CascadeType.ALL)
     private List<Wishlist> wishlist = new ArrayList<>();
 
-    public Book(String bookId, String coverUrl, String title, String author, String styleDesc, String publishDate, String publisher, String category, String subcategory, String description ){
+    public Book(String bookId, String coverUrl, String title, String author, String styleDesc, String publishDate, String publisher, String category, String subcategory, String description,String itemId ){
         this.bookId = bookId;
         this.coverUrl = coverUrl;
         this.title = title;
@@ -53,6 +53,7 @@ public class Book {
         this.category = category;
         this.subcategory = subcategory;
         this.description = description;
+        this.itemId = itemId;
     }
 
     public Book(BookDetailDto bookAladin) {

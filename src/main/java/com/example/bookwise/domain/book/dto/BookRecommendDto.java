@@ -12,12 +12,10 @@ import java.util.List;
 @AllArgsConstructor
 public class BookRecommendDto {
     List<String> user_preferences;
-    List<BookWishCategoryDto> bookWishCategoryDtos;
     List<BookClickDto> bookClickDtos;
 
-    public BookRecommendDto(ArrayList<String> bookList, List<BookWishCategoryDto> bookWishCategoryDtos, List<BookClickDto> bookClickDtos) {
+    public BookRecommendDto(ArrayList<String> bookList, List<BookClickDto> bookClickDtos) {
         this.user_preferences = bookList;
-        this.bookWishCategoryDtos = bookWishCategoryDtos;
         this.bookClickDtos = bookClickDtos;
     }
 }

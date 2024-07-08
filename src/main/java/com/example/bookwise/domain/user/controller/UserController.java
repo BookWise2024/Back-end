@@ -22,16 +22,15 @@ public class UserController {
     private final JwtTokenProvider jwtTokenProvider;
 
 
-
     @Operation(summary = "내 정보 조회")
     @GetMapping("/profile")
-    public UserResponse getMemberProfile(@RequestHeader("Authorization") String accessToken) throws IOException {
+    public UserResponse getMemberProfile(@RequestHeader("Authorization") String accessToken) throws Exception {
 
-            Long userId = jwtTokenProvider.extractId(accessToken);
 
-            return userService.getUser(userId);
+        Long userId = jwtTokenProvider.extractId(accessToken);
+
+        return userService.getUser(userId);
     }
-
 
 
 }

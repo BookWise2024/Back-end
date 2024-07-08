@@ -17,24 +17,13 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final JwtTokenProvider jwtTokenProvider;
 
-
-    @Transactional
-    public void deleteUser(Long id) throws IOException {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            userRepository.delete(user.get());
-        }
-    }
 
     @Transactional(readOnly = true)
     public UserResponse getUser(Long userId) throws IOException {
-
         Optional<User> user = userRepository.findById(userId);
 
-        return new UserResponse(user.get().getUserId(), user.get().getEmail());
-
+        return new UserResponse(user.get().getUserId(), user.get().getEmail(),user.get().getNickname());
 
     }
 }

@@ -27,7 +27,7 @@ public class WishlistService {
 
 
     // 위시리스트 조회
-    public WishlistResponse getWishlist(String accessToken) {
+    public WishlistResponse getWishlist(String accessToken) throws Exception {
 
 //        if(!jwtTokenProvider.isValidAccessToken(accessToken)) {
 //            throw new IllegalStateException("유효하지 않은 회원입니다.");
@@ -50,7 +50,7 @@ public class WishlistService {
     }
 
     // 위시리스트 검색
-    public WishlistResponse getWishlistBySearch(String accessToken, String keyword) {
+    public WishlistResponse getWishlistBySearch(String accessToken, String keyword) throws Exception {
 //        if(!jwtTokenProvider.isValidAccessToken(accessToken)) {
 //            throw new IllegalStateException("유효하지 않은 회원입니다.");
 //        }
