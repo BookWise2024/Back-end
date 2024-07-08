@@ -19,9 +19,18 @@ public class BookController {
     private final BookService bookService;
     private final JwtTokenProvider jwtTokenProvider;
 
+    //
+
+
+
     @GetMapping("/{isbn}")
     public ResponseEntity<?> getBookDetail(@RequestHeader("Authorization") String accessToken,@PathVariable("isbn") String isbn) throws IOException {
-        Long userId = jwtTokenProvider.extractId(accessToken);
+        Long userId;
+        if(!accessToken.equals("")) {
+             userId = jwtTokenProvider.extractId(accessToken);
+        } else {
+            userId = -1L;
+        }
         return bookService.getBookDetails(isbn, userId);
     }
 
@@ -42,6 +51,8 @@ public class BookController {
     public ResponseEntity<?> getBookList(@RequestHeader("Authorization") String accessToken) throws IOException {
 
         Long userId = jwtTokenProvider.extractId(accessToken);
+
+
 
         return bookService.getBookList(userId);
     }
