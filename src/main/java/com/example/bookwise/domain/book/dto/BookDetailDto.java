@@ -21,4 +21,17 @@ public class BookDetailDto {
     private String subcategory;
     private String description;
     private String itemId;
+
+    public BookDetailDto(String bookId, String coverUrl, String title, String author, String styleDesc, String publishDate, String publisher, String category, String subcategory, String description) {
+        this.bookId = bookId;
+        this.coverUrl = coverUrl;
+        this.title = title;
+        this.author = author;
+        this.styleDesc = styleDesc;
+        this.publishDate = publishDate;
+        this.publisher = publisher;
+        this.category = category;
+        this.subcategory = subcategory;
+        this.description = description;
+    }
 }

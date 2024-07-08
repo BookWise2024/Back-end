@@ -42,10 +42,6 @@ public class BookService {
     @Value("${url.ml}")
     private String url;
 
-    // userRecommend,preferOne, preferTwo
-
-
-
     private final BookClickService bookClickService;
     private final WishcategoryRepository wishcategoryRepository;
     private final WishcategoryService wishcategoryService;
@@ -71,10 +67,10 @@ public class BookService {
             bookRepository.save(book);
         }
 
-
+        // 책 클릭수 증가
         bookClickService.clickBook(userId, isbn);
 
-        BookDetailDto bookDetailDto = new BookDetailDto(book.getBookId(),book.getCoverUrl(),book.getTitle(),book.getAuthor(),book.getStyleDesc(),book.getPublishDate(),book.getPublisher(),book.getCategory(), book.getSubcategory(),book.getDescription(),book.getItemId());
+        BookDetailDto bookDetailDto = new BookDetailDto(book.getBookId(),book.getCoverUrl(),book.getTitle(),book.getAuthor(),book.getStyleDesc(),book.getPublishDate(),book.getPublisher(),book.getCategory(), book.getSubcategory(),book.getDescription());
 
 
 //            // url에 api 키 와 isbn 동적으로 삽입 ( json 형식으로 받아옴 )
@@ -128,7 +124,7 @@ public class BookService {
         // 리뷰데이터 받기
         public ResponseEntity<?> getItemIdToDataTeam (String itemId) throws JsonProcessingException {
 
-            String dataTeamApiUrl = String.format("http://13.125.215.49:5000/api/sentiment/reviews/%s", itemId);
+            String dataTeamApiUrl = String.format(url+"/api/sentiment/reviews/%s", itemId);
             //      String response  = restTemplate.postForObject(dataTeamApiUrl, null, String.class);
             String response = restTemplate.getForObject(dataTeamApiUrl, String.class);
 
@@ -138,28 +134,37 @@ public class BookService {
 
 
         // 카테고리 높은 2개 보내고 추천 도서들 받기
-        private List<BookByMlDto> getBooksByCategoryCount (Long userId) throws IOException {
-            List<Wishcategory> wishcategoryList = wishcategoryRepository.findByUser_UserId(userId);
+        private BookRecommendByCategoryDto getBooksByCategoryCount (Wishcategory categoryFirst,Wishcategory categorySecond) throws IOException {
+//            List<Wishcategory> wishcategoryList = wishcategoryRepository.findByUser_UserId(userId);
+//
+//            // count 기준으로 오름차순 정렬되는 PriorityQueue 생성
+//            PriorityQueue<Wishcategory> priorityQueue = new PriorityQueue<>(2, (w1, w2) -> Long.compare(w1.getCount(), w2.getCount()));
+//
+//            for (Wishcategory wishcategory : wishcategoryList) {
+//                priorityQueue.offer(wishcategory);
+//                if (priorityQueue.size() > 2) {
+//                    priorityQueue.poll(); // 최소 값을 제거하여 상위 2개의 요소만 유지
+//                }
+//            }
 
-            // count 기준으로 오름차순 정렬되는 PriorityQueue 생성
-            PriorityQueue<Wishcategory> priorityQueue = new PriorityQueue<>(2, (w1, w2) -> Long.compare(w1.getCount(), w2.getCount()));
-
-            for (Wishcategory wishcategory : wishcategoryList) {
-                priorityQueue.offer(wishcategory);
-                if (priorityQueue.size() > 2) {
-                    priorityQueue.poll(); // 최소 값을 제거하여 상위 2개의 요소만 유지
-                }
-            }
+            System.out.println("첫번째:"+categoryFirst+"두번째: "+categorySecond);
+            System.out.println("첫번째:"+ categoryFirst.getCategory()+"두번째: "+categorySecond.getCategory());
 
             // ML 서버 URL 설정
             String urlStr = UriComponentsBuilder.fromHttpUrl(url)
                     .path("/api/recommend/wishlist/count")
-                    .queryParam("preferred_cateogries", priorityQueue.poll())
-                    .queryParam("preferred_cateogries", priorityQueue.poll())
+                    .queryParam("preferred_categories",categoryFirst.getCategory())
+                    .queryParam("preferred_categories",categorySecond.getCategory())
                     .toUriString();
+
+            System.out.println(urlStr);
             String response = restTemplate.getForObject(urlStr, String.class);
             log.info("category 기반 : {}", response);
-            return parseJsonResponse(response);
+
+            BookRecommendByCategoryDto dto = objectMapper.readValue(response, new TypeReference<BookRecommendByCategoryDto>() {});
+
+
+            return dto;
         }
 
         // isbn 보내고 비슷한 도서들 받기
@@ -196,20 +201,20 @@ public class BookService {
             // 책을 찾고, 없으면 예외 발생
             Book optionalBook = bookRepository.findByBookId(isbn).orElseThrow(() -> new EntityNotFoundException("해당 책은 존재하지 않습니다."));
             System.out.println(optionalBook.getBookId());
-            Book book;
+//            Book book;
 
-            if (optionalBook != null) {
-                book = optionalBook;
-            } else {
-                book = new Book(findBookAladin(isbn));
-                bookRepository.save(book);
-            }
+//            if (optionalBook != null) {
+//                book = optionalBook;
+//            } else {
+//                book = new Book(findBookAladin(isbn));
+//                bookRepository.save(book);
+//            }
             // 위시리스트 생성
-            Wishlist wishlist = new Wishlist(user, book);
+            Wishlist wishlist = new Wishlist(user, optionalBook);
             wishlistRepository.save(wishlist); // 위시리스트 저장
 
             // 상세조회시 위시 카테고리 up
-            wishcategoryService.increaseWishcategory(userId, book.getCategory());
+            wishcategoryService.increaseWishcategory(userId, optionalBook.getCategory());
 
             return ResponseEntity.ok("위시리스트에 추가되었습니다.");
         }
@@ -229,6 +234,7 @@ public class BookService {
                     .orElseThrow(() -> new EntityNotFoundException("해당 위시리스트 항목은 존재하지 않습니다."));
 
             wishlistRepository.delete(wishlist);
+            wishcategoryService.decreaseWishcategory(userId, book.getCategory());
             return ResponseEntity.ok("위시리스트에 삭제되었습니다.");
         }
 
@@ -301,9 +307,8 @@ public class BookService {
                 bookClickDtos.add(bt);
             }
 
-            // 유저 선호책 ,책별 클릭수
+            // 유저 선호책 ,책별 클릭수 로 데이터 받아오기
             BookRecommendDto br = new BookRecommendDto(bookList, bookClickDtos);
-
             System.out.println("prefe : " + br.getUser_preferences().toString() + "click : " + br.getBookClickDtos().toString());
 
             // ML 서버 URL 설정
@@ -311,14 +316,41 @@ public class BookService {
                     .path("/api/recommend/recommendations")
                     .toUriString();
 
-            List<BookByMlDto> booksByCategoryCount = getBooksByCategoryCount(userId);
-
-
             ResponseEntity<String> response = restTemplate.postForEntity(urlStr, br, String.class);
-            log.info("pre 기반 : {}", String.valueOf(response));
+
+            String jsonResponse = response.getBody();
+
+            List<BookByMlDto> booksByRecommend = objectMapper.readValue(jsonResponse, new TypeReference<List<BookByMlDto>>() {});
 
 
-            return ResponseEntity.ok(response.getBody());
+            System.out.println("isbn:"+booksByRecommend.get(0).getIsbn13()+" cover}"+booksByRecommend.get(0).getCoverURL());
+
+
+
+
+            // 카테고리 높은거 2개 보내기
+            List<Wishcategory> wishcategoryList = wishcategoryRepository.findByUser_UserId(userId);
+
+            // count 기준으로 오름차순 정렬되는 PriorityQueue 생성
+            PriorityQueue<Wishcategory> priorityQueue = new PriorityQueue<>(2, (w1, w2) -> Long.compare(w1.getCount(), w2.getCount()));
+
+            for (Wishcategory wishcategory : wishcategoryList) {
+                priorityQueue.offer(wishcategory);
+                if (priorityQueue.size() > 2) {
+                    priorityQueue.poll(); // 최소 값을 제거하여 상위 2개의 요소만 유지
+                }
+            }
+            Wishcategory categoryFirst =  priorityQueue.poll();
+            Wishcategory categorySecond =  priorityQueue.poll();
+
+            BookRecommendByCategoryDto booksByCategoryCount = getBooksByCategoryCount(categoryFirst,categorySecond);
+
+            List<String> categories = new ArrayList<>();
+            categories.add(categoryFirst.getCategory());
+            categories.add(categorySecond.getCategory());
+            BookRecommendResponse bookRecommendResponse = new BookRecommendResponse(categories,booksByRecommend,booksByCategoryCount.getFirst(),booksByCategoryCount.getSecond());
+
+            return ResponseEntity.ok(bookRecommendResponse);
 //        return ResponseEntity.ok(br);
         }
     }
