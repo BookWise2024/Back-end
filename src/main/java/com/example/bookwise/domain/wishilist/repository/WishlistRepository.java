@@ -22,5 +22,7 @@ public interface WishlistRepository extends JpaRepository<Wishlist, WishlistId> 
 
     List<Wishlist> findByUserUserIdAndBook_TitleContaining(Long userId, String keyword);
 
+    Boolean existsByUserUserIdAndBookBookId(Long userId,String bookId);
+
     Optional<Wishlist> findByUserAndBook(User user, Book book);
 }

@@ -5,6 +5,7 @@ import com.example.bookwise.domain.oauth.jwt.JwtTokenProvider;
 import com.example.bookwise.domain.user.entity.User;
 import com.example.bookwise.domain.user.repository.UserRepository;
 import com.example.bookwise.domain.wishilist.dto.WishlistBookDto;
+import com.example.bookwise.domain.wishilist.dto.WishlistIsExistDto;
 import com.example.bookwise.domain.wishilist.dto.WishlistResponse;
 import com.example.bookwise.domain.wishilist.entity.Wishlist;
 import com.example.bookwise.domain.wishilist.repository.WishlistRepository;
@@ -48,6 +49,20 @@ public class WishlistService {
 
         return new WishlistResponse(result.size(), result);
     }
+
+        // 도서와 위시리스트 조회
+        public WishlistIsExistDto getWishlistByBook(Long userId, String bookId) throws Exception {
+
+        if(wishlistRepository.existsByUserUserIdAndBookBookId(userId,bookId)) {
+            return new WishlistIsExistDto("Y");
+        }
+
+        return new WishlistIsExistDto("N");
+    }
+
+
+
+
 
     // 위시리스트 검색
     public WishlistResponse getWishlistBySearch(String accessToken, String keyword) throws Exception {

@@ -11,8 +11,10 @@ import com.example.bookwise.domain.user.repository.UserRepository;
 import com.example.bookwise.domain.wishcategory.entity.Wishcategory;
 import com.example.bookwise.domain.wishcategory.repository.WishcategoryRepository;
 import com.example.bookwise.domain.wishcategory.service.WishcategoryService;
+import com.example.bookwise.domain.wishilist.dto.WishlistIsExistDto;
 import com.example.bookwise.domain.wishilist.entity.Wishlist;
 import com.example.bookwise.domain.wishilist.repository.WishlistRepository;
+import com.example.bookwise.domain.wishilist.service.WishlistService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -45,6 +47,7 @@ public class BookService {
     private final BookClickService bookClickService;
     private final WishcategoryRepository wishcategoryRepository;
     private final WishcategoryService wishcategoryService;
+    private final WishlistService wishlistService;
     private final BookClickRepository bookClickRepository;
     private final WishlistRepository wishlistRepository;
     private final RestTemplate restTemplate;
@@ -52,7 +55,7 @@ public class BookService {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
 
-    public ResponseEntity<?> getBookDetails(String isbn, Long userId) throws IOException {
+    public ResponseEntity<?> getBookDetails(String isbn, Long userId) throws Exception {
 
 
         Optional<Book> isBook = bookRepository.findByBookId(isbn);
@@ -68,10 +71,16 @@ public class BookService {
             bookRepository.save(book);
         }
 
-        // 책 클릭수 증가
-        if(userId != -1L) bookClickService.clickBook(userId, isbn);
 
-        BookDetailDto bookDetailDto = new BookDetailDto(book.getBookId(),book.getCoverUrl(),book.getTitle(),book.getAuthor(),book.getStyleDesc(),book.getPublishDate(),book.getPublisher(),book.getCategory(), book.getSubcategory(),book.getDescription());
+        WishlistIsExistDto wishlistIsExistDto = wishlistService.getWishlistByBook(userId,isbn);
+
+        // 책 클릭수 증가
+        if(userId != -1L) {
+            bookClickService.clickBook(userId, isbn);
+//            wishlistIsExistDto = new WishlistIsExistDto("N");
+        }
+
+        BookDetailDto bookDetailDto = new BookDetailDto(book.getBookId(),book.getCoverUrl(),book.getTitle(),book.getAuthor(),book.getStyleDesc(),book.getPublishDate(),book.getPublisher(),book.getCategory(), book.getSubcategory(),book.getDescription(),wishlistIsExistDto.getWishlistExist());
 
 
 //            // url에 api 키 와 isbn 동적으로 삽입 ( json 형식으로 받아옴 )
@@ -271,8 +280,8 @@ public class BookService {
                     item.path("publisher").asText(),
                     mainCategory,
                     subCategory,
-                    item.path("description").asText(),
-                    itemId
+                    item.path("description").asText()
+//                    itemId
             );
             return bookDetailDto;
         }
