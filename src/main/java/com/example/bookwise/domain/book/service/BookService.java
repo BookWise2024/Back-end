@@ -31,10 +31,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.PriorityQueue;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -322,16 +319,25 @@ public class BookService {
             List<BookClickDto> bookClickDtos = new ArrayList<>();
             List<BookClick> bookClick = bookClickRepository.findByUserUserId(userId);
 
+//            for (BookClick bookClick1 : bookClick) {
+//                BookClickDto bt = new BookClickDto(bookClick1);
+//                bookClickDtos.add(bt);
+//            }
+
+            Map<String, Long> clicksMap = new HashMap<>();
             for (BookClick bookClick1 : bookClick) {
-                BookClickDto bt = new BookClickDto(bookClick1);
-                bookClickDtos.add(bt);
+                clicksMap.put(bookClick1.getBookId(),bookClick1.getClick());
             }
 
             // 유저 선호책 ,책별 클릭수 로 데이터 받아오기
-            BookRecommendDto br = new BookRecommendDto(bookList, bookClickDtos);
+//            BookRecommendDto br = new BookRecommendDto(bookList, bookClickDtos);
+
+            BookRecommendDto br = new BookRecommendDto(bookList, clicksMap);
+
+
 //            System.out.println("prefe : " + br.getUser_preferences().toString() + "click : " + br.getBookClickDtos().toString());
 
-            log.info("prefe: {}, click: {}",br.getUser_preferences().toString(),br.getBookClickDtos().toString());
+            log.info("prefe: {}, click: {}",br.getUser_preferences().toString(),br.getClicksMap().toString());
 
             // ML 서버 URL 설정
             String urlStr = UriComponentsBuilder.fromHttpUrl(url)
