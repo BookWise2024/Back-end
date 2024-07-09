@@ -67,5 +67,6 @@ public class Book {
         this.publishDate = bookAladin.getPublishDate();
         this.title = bookAladin.getTitle();
         this.author = bookAladin.getAuthor();
+        this.itemId = bookAladin.getItemId();
     }
 }

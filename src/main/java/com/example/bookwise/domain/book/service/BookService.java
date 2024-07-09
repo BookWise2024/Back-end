@@ -80,7 +80,7 @@ public class BookService {
 //            wishlistIsExistDto = new WishlistIsExistDto("N");
         }
 
-        BookDetailDto bookDetailDto = new BookDetailDto(book.getBookId(),book.getCoverUrl(),book.getTitle(),book.getAuthor(),book.getStyleDesc(),book.getPublishDate(),book.getPublisher(),book.getCategory(), book.getSubcategory(),book.getDescription(),wishlistIsExistDto.getWishlistExist());
+        BookDetailDto bookDetailDto = new BookDetailDto(book.getBookId(),book.getCoverUrl(),book.getTitle(),book.getAuthor(),book.getStyleDesc(),book.getPublishDate(),book.getPublisher(),book.getCategory(), book.getSubcategory(),book.getDescription(),book.getItemId(),wishlistIsExistDto.getWishlistExist());
 
 
 //            // url에 api 키 와 isbn 동적으로 삽입 ( json 형식으로 받아옴 )
@@ -132,9 +132,22 @@ public class BookService {
         }
 
         // 리뷰데이터 받기
-        public ResponseEntity<?> getItemIdToDataTeam (String itemId) throws JsonProcessingException {
+        public ResponseEntity<?> getItemIdToDataTeam (String bookId) throws JsonProcessingException {
 
-            String dataTeamApiUrl = String.format(url+"/api/sentiment/reviews/%s", itemId);
+            Optional<Book> isBook = bookRepository.findByBookId(bookId);
+
+            Book book = null;
+
+            if (isBook.isPresent()) {         // db에 존재하면 그냥 return
+                book = isBook.get();
+
+            } else {                        // db에 없으면 알라딘에서 가져오기
+                book = new Book(findBookAladin(bookId));
+            }
+
+
+
+            String dataTeamApiUrl = String.format(url+"/api/sentiment/reviews/%s", book.getItemId());
             //      String response  = restTemplate.postForObject(dataTeamApiUrl, null, String.class);
             String response = restTemplate.getForObject(dataTeamApiUrl, String.class);
 
@@ -280,8 +293,8 @@ public class BookService {
                     item.path("publisher").asText(),
                     mainCategory,
                     subCategory,
-                    item.path("description").asText()
-//                    itemId
+                    item.path("description").asText(),
+                    itemId
             );
             return bookDetailDto;
         }
