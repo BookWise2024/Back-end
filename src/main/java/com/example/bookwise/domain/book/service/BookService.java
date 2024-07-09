@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.models.info.Info;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -213,11 +214,11 @@ public class BookService {
             // 유저를 찾고, 없으면 예외 발생
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new EntityNotFoundException("해당 유저는 존재하지 않습니다."));
-            System.out.println(user.getUserId());
+       //     System.out.println(user.getUserId());
 
             // 책을 찾고, 없으면 예외 발생
             Book optionalBook = bookRepository.findByBookId(isbn).orElseThrow(() -> new EntityNotFoundException("해당 책은 존재하지 않습니다."));
-            System.out.println(optionalBook.getBookId());
+     //       System.out.println(optionalBook.getBookId());
 //            Book book;
 
 //            if (optionalBook != null) {
@@ -228,10 +229,28 @@ public class BookService {
 //            }
             // 위시리스트 생성
             Wishlist wishlist = new Wishlist(user, optionalBook);
+
+            if(wishlistRepository.existsByUserUserIdAndBookBookId(userId,optionalBook.getBookId())) {
+                throw new EntityExistsException("이미 존재하는 위시리스트입니다.");
+            }
+
+
             wishlistRepository.save(wishlist); // 위시리스트 저장
 
-            // 상세조회시 위시 카테고리 up
-            wishcategoryService.increaseWishcategory(userId, optionalBook.getCategory());
+//            // 상세조회시 위시 카테고리 up
+//            wishcategoryService.increaseWishcategory(userId, optionalBook.getCategory());
+
+            // 위시카테고리 저장
+            Wishcategory wishcategory = wishcategoryRepository.findByUser_UserIdAndCategory(userId, optionalBook.getCategory()).orElseThrow(() -> new EntityNotFoundException("해당 위시카테고리 항목은 존재하지 않습니다."));
+
+            log.info("위시 카테고리 저장 전: {}, {}", optionalBook.getCategory(),wishcategory.getCount());
+
+            wishcategory.increase();
+
+            log.info("위시 카테고리 저장 후: {}, {}", optionalBook.getCategory(),wishcategory.getCount());
+
+            wishcategoryRepository.save(wishcategory);
+
 
             return ResponseEntity.ok("위시리스트에 추가되었습니다.");
         }
@@ -251,7 +270,18 @@ public class BookService {
                     .orElseThrow(() -> new EntityNotFoundException("해당 위시리스트 항목은 존재하지 않습니다."));
 
             wishlistRepository.delete(wishlist);
-            wishcategoryService.decreaseWishcategory(userId, book.getCategory());
+//            wishcategoryService.decreaseWishcategory(userId, book.getCategory());
+
+            Wishcategory wishcategory = wishcategoryRepository.findByUser_UserIdAndCategory(userId, book.getCategory()).orElseThrow(() -> new EntityNotFoundException("해당 위시카테고리 항목은 존재하지 않습니다."));
+
+            log.info("위시 카테고리 삭제전 : {} , {}", book.getCategory(),wishcategory.getCount());
+
+            wishcategory.decrease();
+
+            log.info("위시 카테고리 삭제후 : {} , {}", book.getCategory(),wishcategory.getCount());
+
+            wishcategoryRepository.save(wishcategory);
+
             return ResponseEntity.ok("위시리스트에 삭제되었습니다.");
         }
 

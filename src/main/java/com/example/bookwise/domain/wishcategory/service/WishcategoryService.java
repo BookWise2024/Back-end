@@ -58,30 +58,30 @@ public class WishcategoryService {
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-    // 위시카테고리 증가
-    @Transactional
-    public String increaseWishcategory(Long userId, String category) {
+//    // 위시카테고리 증가
+//    @Transactional
+//    public String increaseWishcategory(Long userId, String category) {
+//
+//        Wishcategory wishcategory = wishcategoryRepository.findByUser_UserIdAndCategory(userId, category).orElseThrow();
+//
+//        wishcategory.increase();
+//
+//        wishcategoryRepository.save(wishcategory);
+//
+//        return "wish category 증가";
+//    }
 
-        Wishcategory wishcategory = wishcategoryRepository.findByUser_UserIdAndCategory(userId, category).orElseThrow();
 
-        wishcategory.increase();
-
-        wishcategoryRepository.save(wishcategory);
-
-        return "wish category 증가";
-    }
-
-
-    // 위시카테고리 감소
-    @Transactional
-    public ResponseEntity<String> decreaseWishcategory(Long userId, String category) {
-
-        Wishcategory wishcategory = wishcategoryRepository.findByUser_UserIdAndCategory(userId, category).orElseThrow();
-
-        wishcategory.decrease();
-
-        wishcategoryRepository.save(wishcategory);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
-    }
+//    // 위시카테고리 감소
+//    @Transactional
+//    public ResponseEntity<String> decreaseWishcategory(Long userId, String category) {
+//
+//        Wishcategory wishcategory = wishcategoryRepository.findByUser_UserIdAndCategory(userId, category).orElseThrow();
+//
+//        wishcategory.decrease();
+//
+//        wishcategoryRepository.save(wishcategory);
+//        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+//    }
 
 }
