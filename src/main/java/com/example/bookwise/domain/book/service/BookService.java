@@ -31,10 +31,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.PriorityQueue;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -301,14 +298,15 @@ public class BookService {
         }
 
 
-        public ResponseEntity<?> getBookList (Long userId) throws IOException {
 
-            List<Wishlist> wishlists = wishlistRepository.findByUserUserId(userId);
-            ArrayList<String> bookList = new ArrayList<>();
+    public ResponseEntity<?> getBookList (Long userId) throws IOException {
 
-            for (Wishlist wishlist : wishlists) {
-                bookList.add(wishlist.getBook().getBookId());
-            }
+        List<Wishlist> wishlists = wishlistRepository.findByUserUserId(userId);
+        ArrayList<String> bookList = new ArrayList<>();
+
+        for (Wishlist wishlist : wishlists) {
+            bookList.add(wishlist.getBook().getBookId());
+        }
 
 
 //        List<BookWishCategoryDto> bookWishCategoryDtos = new ArrayList<>();
@@ -319,30 +317,40 @@ public class BookService {
 //        }
 
 
-            List<BookClickDto> bookClickDtos = new ArrayList<>();
-            List<BookClick> bookClick = bookClickRepository.findByUserUserId(userId);
+        List<BookClickDto> bookClickDtos = new ArrayList<>();
+        List<BookClick> bookClick = bookClickRepository.findByUserUserId(userId);
 
-            for (BookClick bookClick1 : bookClick) {
-                BookClickDto bt = new BookClickDto(bookClick1);
-                bookClickDtos.add(bt);
-            }
+//            for (BookClick bookClick1 : bookClick) {
+//                BookClickDto bt = new BookClickDto(bookClick1);
+//                bookClickDtos.add(bt);
+//            }
 
-            // 유저 선호책 ,책별 클릭수 로 데이터 받아오기
-            BookRecommendDto br = new BookRecommendDto(bookList, bookClickDtos);
+        Map<String, Long> clicksMap = new HashMap<>();
+        for (BookClick bookClick1 : bookClick) {
+            clicksMap.put(bookClick1.getBookId(),bookClick1.getClick());
+        }
+
+
+        // 유저 선호책 ,책별 클릭수 로 데이터 받아오기
+//            BookRecommendDto br = new BookRecommendDto(bookList, bookClickDtos);
+
+        BookRecommendDto br = new BookRecommendDto(bookList, clicksMap);
+
+
 //            System.out.println("prefe : " + br.getUser_preferences().toString() + "click : " + br.getBookClickDtos().toString());
 
-            log.info("prefe: {}, click: {}",br.getUser_preferences().toString(),br.getBookClickDtos().toString());
+        log.info("prefe: {}, click: {}",br.getUser_preferences().toString(),br.getClicksMap().toString());
 
-            // ML 서버 URL 설정
-            String urlStr = UriComponentsBuilder.fromHttpUrl(url)
-                    .path("/api/recommend/recommendations")
-                    .toUriString();
+        // ML 서버 URL 설정
+        String urlStr = UriComponentsBuilder.fromHttpUrl(url)
+                .path("/api/recommend/recommendations")
+                .toUriString();
 
-            ResponseEntity<String> response = restTemplate.postForEntity(urlStr, br, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(urlStr, br, String.class);
 
-            String jsonResponse = response.getBody();
+        String jsonResponse = response.getBody();
 
-            List<BookByMlDto> booksByRecommend = objectMapper.readValue(jsonResponse, new TypeReference<List<BookByMlDto>>() {});
+        List<BookByMlDto> booksByRecommend = objectMapper.readValue(jsonResponse, new TypeReference<List<BookByMlDto>>() {});
 
 
 //            System.out.println("isbn:"+booksByRecommend.get(0).getIsbn13()+" cover}"+booksByRecommend.get(0).getCoverURL());
@@ -350,29 +358,29 @@ public class BookService {
 
 
 
-            // 카테고리 높은거 2개 보내기
-            List<Wishcategory> wishcategoryList = wishcategoryRepository.findByUser_UserId(userId);
+        // 카테고리 높은거 2개 보내기
+        List<Wishcategory> wishcategoryList = wishcategoryRepository.findByUser_UserId(userId);
 
-            // count 기준으로 오름차순 정렬되는 PriorityQueue 생성
-            PriorityQueue<Wishcategory> priorityQueue = new PriorityQueue<>(2, (w1, w2) -> Long.compare(w1.getCount(), w2.getCount()));
+        // count 기준으로 오름차순 정렬되는 PriorityQueue 생성
+        PriorityQueue<Wishcategory> priorityQueue = new PriorityQueue<>(2, (w1, w2) -> Long.compare(w1.getCount(), w2.getCount()));
 
-            for (Wishcategory wishcategory : wishcategoryList) {
-                priorityQueue.offer(wishcategory);
-                if (priorityQueue.size() > 2) {
-                    priorityQueue.poll(); // 최소 값을 제거하여 상위 2개의 요소만 유지
-                }
+        for (Wishcategory wishcategory : wishcategoryList) {
+            priorityQueue.offer(wishcategory);
+            if (priorityQueue.size() > 2) {
+                priorityQueue.poll(); // 최소 값을 제거하여 상위 2개의 요소만 유지
             }
-            Wishcategory categoryFirst =  priorityQueue.poll();
-            Wishcategory categorySecond =  priorityQueue.poll();
-
-            BookRecommendByCategoryDto booksByCategoryCount = getBooksByCategoryCount(categoryFirst,categorySecond);
-
-            List<String> categories = new ArrayList<>();
-            categories.add(categoryFirst.getCategory());
-            categories.add(categorySecond.getCategory());
-            BookRecommendResponse bookRecommendResponse = new BookRecommendResponse(categories,booksByRecommend,booksByCategoryCount.getFirst(),booksByCategoryCount.getSecond());
-
-            return ResponseEntity.ok(bookRecommendResponse);
-//        return ResponseEntity.ok(br);
         }
+        Wishcategory categoryFirst =  priorityQueue.poll();
+        Wishcategory categorySecond =  priorityQueue.poll();
+
+        BookRecommendByCategoryDto booksByCategoryCount = getBooksByCategoryCount(categoryFirst,categorySecond);
+
+        List<String> categories = new ArrayList<>();
+        categories.add(categoryFirst.getCategory());
+        categories.add(categorySecond.getCategory());
+        BookRecommendResponse bookRecommendResponse = new BookRecommendResponse(categories,booksByRecommend,booksByCategoryCount.getFirst(),booksByCategoryCount.getSecond());
+
+        return ResponseEntity.ok(bookRecommendResponse);
+//        return ResponseEntity.ok(br);
+    }
     }
