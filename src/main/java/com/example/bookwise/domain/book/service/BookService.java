@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.models.info.Info;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -329,6 +330,8 @@ public class BookService {
             // 유저 선호책 ,책별 클릭수 로 데이터 받아오기
             BookRecommendDto br = new BookRecommendDto(bookList, bookClickDtos);
 //            System.out.println("prefe : " + br.getUser_preferences().toString() + "click : " + br.getBookClickDtos().toString());
+
+            log.info("prefe: {}, click: {}",br.getUser_preferences().toString(),br.getBookClickDtos().toString());
 
             // ML 서버 URL 설정
             String urlStr = UriComponentsBuilder.fromHttpUrl(url)
