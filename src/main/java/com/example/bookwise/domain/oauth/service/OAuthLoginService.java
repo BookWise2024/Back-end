@@ -8,8 +8,7 @@ import com.example.bookwise.domain.oauth.OAuthLoginParams;
 //import com.example.bookwise.domain.oauth.jwt.JwtTokenProvider;
 //import com.example.bookwise.domain.redis.AccessToken;
 //import com.example.bookwise.domain.redis.RedisUtil;
-import com.example.bookwise.domain.redis.AccessToken;
-import com.example.bookwise.domain.redis.RedisUtil;
+
 import com.example.bookwise.domain.user.entity.User;
 import com.example.bookwise.domain.user.repository.UserRepository;
 import com.example.bookwise.domain.wishcategory.service.WishcategoryService;
@@ -26,7 +25,7 @@ public class OAuthLoginService {
     private final RequestOAuthInfoService requestOAuthInfoService;
     private final UserRepository userRepository;
     private final WishcategoryService wishcategoryService;
-    private final RedisUtil redisUtil;
+//    private final RedisUtil redisUtil;
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;            // 30분
 
 
@@ -35,7 +34,7 @@ public class OAuthLoginService {
         OAuthInfoResponse oAuthInfoResponse = requestOAuthInfoService.request(params);
         Long userId = findOrCreateUser(oAuthInfoResponse);
         AuthTokens authTokens = authTokensGenerator.generate(userId);
-        AccessToken accessToken = new AccessToken(authTokens.getAccessToken(),String.valueOf(userId));
+//        AccessToken accessToken = new AccessToken(authTokens.getAccessToken(),String.valueOf(userId));
 
 //        redisUtil.set(authTokens.getAccessToken(),accessToken, (int)ACCESS_TOKEN_EXPIRE_TIME);
         return authTokens;
