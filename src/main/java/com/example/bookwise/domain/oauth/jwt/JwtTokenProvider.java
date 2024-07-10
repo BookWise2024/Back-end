@@ -1,7 +1,6 @@
 package com.example.bookwise.domain.oauth.jwt;
 
-//import com.example.bookwise.domain.redis.RedisUtil;
-import com.example.bookwise.domain.redis.RedisUtil;
+
 import com.example.bookwise.global.error.CustomForbiddenException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -20,10 +19,10 @@ public class JwtTokenProvider {
 
     private final Key key;
 
-    private final RedisUtil redisUtil;
+//    private final RedisUtil redisUtil;
 
-    public JwtTokenProvider(@Value("${jwt.secret-key}") String secretKey, RedisUtil redisUtil) {
-        this.redisUtil = redisUtil;
+    public JwtTokenProvider(@Value("${jwt.secret-key}") String secretKey) {
+//        this.redisUtil = redisUtil;
         //    this.redisUtil = redisUtil;
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
@@ -72,10 +71,10 @@ public class JwtTokenProvider {
                     .setSigningKey(key)
                     .build()
                     .parseClaimsJws(accessToken);
-            if(redisUtil.hasKeyBlackList(accessToken)) {        // 로그아웃 끝난 토큰
-                log.info("로그아웃된 토큰입니다.");
-                return false;
-            }
+//            if(redisUtil.hasKeyBlackList(accessToken)) {        // 로그아웃 끝난 토큰
+//                log.info("로그아웃된 토큰입니다.");
+//                return false;
+//            }
             return true;  //유효하다면 true 반환
         } catch (MalformedJwtException e) {
             log.info("잘못된 JWT 서명입니다.");
