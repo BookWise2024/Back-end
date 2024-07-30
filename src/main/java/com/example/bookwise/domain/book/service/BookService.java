@@ -6,6 +6,9 @@ import com.example.bookwise.domain.book.repository.BookRepository;
 import com.example.bookwise.domain.bookclick.entity.BookClick;
 import com.example.bookwise.domain.bookclick.repository.BookClickRepository;
 import com.example.bookwise.domain.bookclick.service.BookClickService;
+import com.example.bookwise.domain.library.dto.HasBookDto;
+import com.example.bookwise.domain.library.dto.LibraryComparisonDto;
+import com.example.bookwise.domain.library.dto.LibraryInitDBDto;
 import com.example.bookwise.domain.user.entity.User;
 import com.example.bookwise.domain.user.repository.UserRepository;
 import com.example.bookwise.domain.wishcategory.entity.Wishcategory;
@@ -43,6 +46,9 @@ public class BookService {
     @Value("${url.ml}")
     private String url;
 
+
+    private final LibraryInitDBDto libraryInitDB;
+
     private final BookClickService bookClickService;
     private final WishcategoryRepository wishcategoryRepository;
     private final WishcategoryService wishcategoryService;
@@ -53,6 +59,82 @@ public class BookService {
     private final ObjectMapper objectMapper;
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
+
+
+
+
+    // 10 ~ 20 청소년 도서 조회
+    public ResponseEntity<?> getBookDisplay() throws Exception {
+        String urlStr = "http://data4library.kr/api/loanItemSrchByLib?authKey=" + libraryInitDB.getLibraryBigdataKey()
+                + "&region=" + libraryInitDB.getRegion()
+                + "&from_age=10"
+                + "&end_age=20"
+                + "&pageNo=" + libraryInitDB.getPageNo()
+                + "&pageSize=200"
+                + "&format=" + libraryInitDB.getFormat();
+
+
+        String response = restTemplate.getForObject(urlStr, String.class);
+        JsonNode rootNode = objectMapper.readTree(response);
+        JsonNode responseNode = rootNode.get("response");
+        JsonNode info = responseNode.get("docs");
+
+        ArrayList<BookDisplayDto> bookDisplayDtos = new ArrayList<>();
+        for (JsonNode docs : info) {
+            JsonNode doc = docs.get("doc");
+            bookDisplayDtos.add(new BookDisplayDto(doc.get("bookname").asText(),doc.get("isbn13").asText(),doc.get("bookImageURL").asText()));
+
+        }
+    return ResponseEntity.ok(bookDisplayDtos);
+    }
+    // 20 ~ 40 청년 도서 조회
+    public ResponseEntity<?> getBookDisplay1() throws Exception {
+        String urlStr = "http://data4library.kr/api/loanItemSrchByLib?authKey=" + libraryInitDB.getLibraryBigdataKey()
+                + "&region=" + libraryInitDB.getRegion()
+                + "&from_age=20"
+                + "&end_age=40"
+                + "&pageNo=" + libraryInitDB.getPageNo()
+                + "&pageSize=200"
+                + "&format=" + libraryInitDB.getFormat();
+
+
+        String response = restTemplate.getForObject(urlStr, String.class);
+        JsonNode rootNode = objectMapper.readTree(response);
+        JsonNode responseNode = rootNode.get("response");
+        JsonNode info = responseNode.get("docs");
+
+        ArrayList<BookDisplayDto> bookDisplayDtos = new ArrayList<>();
+        for (JsonNode docs : info) {
+            JsonNode doc = docs.get("doc");
+            bookDisplayDtos.add(new BookDisplayDto(doc.get("bookname").asText(),doc.get("isbn13").asText(),doc.get("bookImageURL").asText()));
+
+        }
+        return ResponseEntity.ok(bookDisplayDtos);
+    }
+    // 40 ~ 50 장년 도서 조회
+    public ResponseEntity<?> getBookDisplay2() throws Exception {
+        String urlStr = "http://data4library.kr/api/loanItemSrchByLib?authKey=" + libraryInitDB.getLibraryBigdataKey()
+                + "&region=" + libraryInitDB.getRegion()
+                + "&from_age=40"
+                + "&end_age=50"
+                + "&pageNo=" + libraryInitDB.getPageNo()
+                + "&pageSize=200"
+                + "&format=" + libraryInitDB.getFormat();
+
+
+        String response = restTemplate.getForObject(urlStr, String.class);
+        JsonNode rootNode = objectMapper.readTree(response);
+        JsonNode responseNode = rootNode.get("response");
+        JsonNode info = responseNode.get("docs");
+
+        ArrayList<BookDisplayDto> bookDisplayDtos = new ArrayList<>();
+        for (JsonNode docs : info) {
+            JsonNode doc = docs.get("doc");
+            bookDisplayDtos.add(new BookDisplayDto(doc.get("bookname").asText(),doc.get("isbn13").asText(),doc.get("bookImageURL").asText()));
+
+        }
+        return ResponseEntity.ok(bookDisplayDtos);
+    }
 
     public ResponseEntity<?> getBookDetails(String isbn, Long userId) throws Exception {
 
@@ -80,52 +162,6 @@ public class BookService {
         }
 
         BookDetailDto bookDetailDto = new BookDetailDto(book.getBookId(),book.getCoverUrl(),book.getTitle(),book.getAuthor(),book.getStyleDesc(),book.getPublishDate(),book.getPublisher(),book.getCategory(), book.getSubcategory(),book.getDescription(),book.getItemId(),wishlistIsExistDto.getWishlistExist());
-
-
-//            // url에 api 키 와 isbn 동적으로 삽입 ( json 형식으로 받아옴 )
-//            String apiUrl = String.format("https://www.aladin.co.kr/ttb/api/ItemLookUp.aspx?ttbkey=%s&itemIdType=ISBN&ItemId=%s&output=js&Version=20131101&SearchTarget=Book", apiKey, isbn);
-//            String response = restTemplate.getForObject(apiUrl, String.class); // 지정 url 로 get 요청
-//
-//            //파싱
-//            JsonNode root = objectMapper.readTree(response);
-//            JsonNode item = root.path("item").get(0);
-//
-//            // 상세 책 검색하거나 좋다고 누르면 카테고리에 + 1 해줘야해
-//
-//            // 카테고리 분리 로직
-//            String category = item.path("categoryName").asText();
-//            String mainCategory = "";
-//            String subCategory = "";
-//
-//            // 상하위 카테고리 분리
-//            if (category.contains(">")) {
-//                String[] categoryParts = category.split(">");
-//                if (categoryParts.length > 1) {
-//                    mainCategory = categoryParts[1].trim();
-//                    subCategory = categoryParts[2].trim();
-//                }
-//            }
-//
-//            String itemId = item.path("itemId").asText();
-//            BookDetailDto bookDetailDto = new BookDetailDto(
-//                    isbn,
-//                    item.path("cover").asText(),
-//                    item.path("title").asText(),
-//                    item.path("author").asText(),
-//                    item.path("SearchTarget").asText(),  //searchtarget 과 동일하다
-//                    item.path("pubDate").asText(),
-//                    item.path("publisher").asText(),
-//                    mainCategory,
-//                    subCategory,
-//                    item.path("description").asText(),
-//                    itemId
-//            );
-
-
-            // sendItemIdToDataTeam(itemId);
-//        // 상세조회시 위시 카테고리 up
-//        wishcategoryService.increaseWishcategory(userId, mainCategory);
-            // 클릭 수 up
 
             return ResponseEntity.ok(bookDetailDto);
         }
@@ -157,17 +193,6 @@ public class BookService {
 
         // 카테고리 높은 2개 보내고 추천 도서들 받기
         private BookRecommendByCategoryDto getBooksByCategoryCount (Wishcategory categoryFirst,Wishcategory categorySecond) throws IOException {
-//            List<Wishcategory> wishcategoryList = wishcategoryRepository.findByUser_UserId(userId);
-//
-//            // count 기준으로 오름차순 정렬되는 PriorityQueue 생성
-//            PriorityQueue<Wishcategory> priorityQueue = new PriorityQueue<>(2, (w1, w2) -> Long.compare(w1.getCount(), w2.getCount()));
-//
-//            for (Wishcategory wishcategory : wishcategoryList) {
-//                priorityQueue.offer(wishcategory);
-//                if (priorityQueue.size() > 2) {
-//                    priorityQueue.poll(); // 최소 값을 제거하여 상위 2개의 요소만 유지
-//                }
-//            }
 
             // ML 서버 URL 설정
             String urlStr = UriComponentsBuilder.fromHttpUrl(url)

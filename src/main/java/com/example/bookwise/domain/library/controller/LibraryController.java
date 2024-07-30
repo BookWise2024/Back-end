@@ -53,4 +53,12 @@ public class LibraryController {
         return libraryService.getLibraryDetailByBook(bookId,libraryId,hasBookDto);
     }
 
+
+    // 도서관 위치조회 (도서정보기반) - test
+    @Operation(summary = "도서관 위치조회 (도서정보기반)", description = "도서정보기반으로 도서관의 위치를 조회합니다.")
+    @GetMapping("/book/{bookId}/test")
+    public LibraryListByBookResponse getLibraryListByBookTest(@PathVariable String bookId,LibraryMapDto libraryMapDto) throws Exception {
+        return libraryService.getLibraryByBookTest(bookId,libraryMapDto);
+    }
+
 }

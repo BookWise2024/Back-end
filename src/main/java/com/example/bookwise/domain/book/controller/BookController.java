@@ -22,6 +22,27 @@ public class BookController {
 
 
 
+    // 최초에는 엄청 오래걸리는데 그 다음부터는 오래 안걸린다. 이유는 네트워크 경로 찾는거 때문일 가능성이 높다. 한번 찾고나서는 다음부터는 대강 아니깐 상대적으로 빠르게 찾는것 같음.
+    @GetMapping("/display/v1")
+    public ResponseEntity<?> getBookDisplay() throws Exception {
+
+        long beforeTime = System.currentTimeMillis(); //코드 실행 전에 시간 받아오기
+
+        //실험할 코드 추가
+        bookService.getBookDisplay();
+        bookService.getBookDisplay1();
+        bookService.getBookDisplay2();
+
+        long afterTime = System.currentTimeMillis(); // 코드 실행 후에 시간 받아오기
+        long secDiffTime = (afterTime - beforeTime)/1000; //두 시간에 차 계산
+        System.out.println("시간차이(m) : "+secDiffTime);
+
+
+        return ResponseEntity.ok("Success");
+    }
+
+
+
 
     @GetMapping("/{isbn}")
     public ResponseEntity<?> getBookDetail(@RequestHeader("Authorization") String accessToken,@PathVariable("isbn") String isbn) throws Exception {
