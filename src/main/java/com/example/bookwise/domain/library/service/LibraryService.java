@@ -32,6 +32,10 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -96,6 +100,9 @@ public class LibraryService {
     // 위치기반 도서관 조회(도서정보)
     public LibraryListByBookResponse getLibraryByBook(String bookId, LibraryMapDto libraryMapDto) throws Exception {
 
+        long beforeTime = System.currentTimeMillis(); //코드 실행 전에 시간 받아오기
+
+
         // 범위안에 있는 도서관들 조회
         List<Library> libraries = libraryRepository.findLibrariesWithinDistance(libraryMapDto.getLatitude(), libraryMapDto.getLongitude(), libraryMapDto.getRange());
 
@@ -125,6 +132,10 @@ public class LibraryService {
             }
         }
 
+        long afterTime = System.currentTimeMillis(); // 코드 실행 후에 시간 받아오기
+        long secDiffTime = (afterTime - beforeTime) / 1000; //두 시간에 차 계산
+        System.out.println("시간차이(m) : " + secDiffTime);
+
         // 거리,보유순에 따라 정렬시키기
         List<LibraryDistanceByBookDto> result = new ArrayList<>();
         if (libraryMapDto.getSort().equals("possession")) {
@@ -145,6 +156,88 @@ public class LibraryService {
 
         return new LibraryListByBookResponse(result);
     }
+
+    // 위치기반 도서관 조회(도서정보)
+    public LibraryListByBookResponse getLibraryByBookTest(String bookId, LibraryMapDto libraryMapDto) throws Exception {
+
+        // 범위안에 있는 도서관들 조회
+        List<Library> libraries = libraryRepository.findLibrariesWithinDistance(libraryMapDto.getLatitude(), libraryMapDto.getLongitude(), libraryMapDto.getRange());
+
+//        PriorityQueue<LibraryDistanceByBookDto> yBookQueue = new PriorityQueue<>(Comparator.comparingDouble(LibraryDistanceByBookDto::getDistance));
+//        PriorityQueue<LibraryDistanceByBookDto> nBookQueue = new PriorityQueue<>(Comparator.comparingDouble(LibraryDistanceByBookDto::getDistance));
+
+        ConcurrentLinkedQueue<LibraryDistanceByBookDto> yBookQueue = new ConcurrentLinkedQueue<>();
+        ConcurrentLinkedQueue<LibraryDistanceByBookDto> nBookQueue = new ConcurrentLinkedQueue<>();
+
+        long beforeTime = System.currentTimeMillis(); //코드 실행 전에 시간 받아오기
+
+        // 비동기 처리를 위한 ExecutorService 생성
+        var executor = Executors.newCachedThreadPool(); // 적절한 스레드 풀 크기로 설정 // 동적으로 쓰레드 생성
+
+        // 각 도서관에 대해 비동기 호출 수행
+        List<CompletableFuture<Void>> futures = libraries.stream()
+                .map(library -> CompletableFuture.runAsync(() -> {
+                    try {
+                        double dis = Library.getDistance(libraryMapDto.getLatitude(), libraryMapDto.getLongitude(), library.getLatitude(), library.getLongitude());
+                        // 보유한지 안한지 api 불러오기
+                        HasBookDto hasBook = getHasBook(bookId, library.getLibraryId());
+                        LibraryDistanceByBookDto dto = LibraryDistanceByBookDto.builder()
+                                .libraryId(library.getLibraryId())
+                                .name(library.getName())
+                                .address(library.getAddress())
+                                .distance(Math.round(dis * 10) / 10.0)
+                                .latitude(library.getLatitude())
+                                .longitude(library.getLongitude())
+                                .hasBook(hasBook.getHasBook())
+                                .loanAvailable(hasBook.getLoanAvailable())
+                                .build();
+                        if (hasBook.equals("Y")) {
+                            synchronized (yBookQueue) {
+                                yBookQueue.add(dto);
+                            }
+                        } else {
+                            synchronized (nBookQueue) {
+                                nBookQueue.add(dto);
+                            }
+                        }
+                    } catch (Exception e) {     // 예외처리 조정하기
+                        e.printStackTrace();
+                    }
+                }, executor))
+                .collect(Collectors.toList());
+
+        // 모든 비동기 작업 완료 대기
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
+        long afterTime = System.currentTimeMillis(); // 코드 실행 후에 시간 받아오기
+        long secDiffTime = (afterTime - beforeTime) / 1000; //두 시간에 차 계산
+        System.out.println("시간차이(m) : " + secDiffTime);
+
+        // 거리,보유순에 따라 정렬시키기
+        List<LibraryDistanceByBookDto> result = new ArrayList<>();
+        if (libraryMapDto.getSort().equals("possession")) {
+            while (!yBookQueue.isEmpty()) {
+                result.add(yBookQueue.poll());
+            }
+            while (!nBookQueue.isEmpty()) {
+                result.add(nBookQueue.poll());
+            }
+        } else if (libraryMapDto.getSort().equals("distance")) {
+            PriorityQueue<LibraryDistanceByBookDto> allBookQueue = new PriorityQueue<>(Comparator.comparingDouble(LibraryDistanceByBookDto::getDistance));
+            allBookQueue.addAll(yBookQueue);
+            allBookQueue.addAll(nBookQueue);
+            while (!allBookQueue.isEmpty()) {
+                result.add(allBookQueue.poll());
+            }
+        }
+
+        // Executor 서비스 종료
+        executor.shutdown();
+        executor.awaitTermination(1, TimeUnit.MINUTES);
+
+        return new LibraryListByBookResponse(result);
+    }
+
 
     // 도서관 상세정보 조회(도서기반)
     public LibraryDetailByBookResponse getLibraryDetailByBook(String bookId, long libraryId, HasBookDto hasBookDto) throws Exception {
